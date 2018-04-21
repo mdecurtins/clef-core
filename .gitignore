@@ -1,0 +1,4 @@
+# Gitignore for clef-core
+.metadata/
+.mvn/
+.recommenders/
