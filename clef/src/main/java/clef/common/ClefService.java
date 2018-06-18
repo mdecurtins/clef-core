@@ -5,10 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import clef.api.domain.*;
+import clef.api.domain.response.*;
 import clef.mir.*;
 import clef.common.music.datamodel.*;
 
@@ -43,10 +45,10 @@ public class ClefService {
 			
 			List<ClefItem> items = this.mapAlgorithmResponse( aer );
 			
-			response = ClefResponseFactory.resultResponse( items );
+			response = ClefResponseFactory.make( ResponseType.RESULT, items );
 		} catch ( ClefException | IOException e ) {
-			
-			response = ClefResponseFactory.errorResponse( e.getMessage() );
+			List<ClefError> errs = Arrays.asList( new ClefError(e.getMessage()) );
+			response = ClefResponseFactory.make( ResponseType.ERROR, errs );
 		}
 		
 		return response;

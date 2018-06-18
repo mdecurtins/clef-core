@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import clef.api.domain.*;
+import clef.api.domain.response.ClefResponse;
+import clef.api.domain.response.ClefResponseFactory;
+import clef.api.domain.response.ResponseType;
 import clef.api.utility.QueryHelper;
 import clef.common.ClefException;
 import clef.common.ClefService;
@@ -36,7 +39,6 @@ public class Application {
 		
 		// Prepare the response and the container for the response items.
 		ClefResponse response = null;
-		ClefResponseBody container = null;
 		
 		try {
 			ClefService cs = new ClefService();
@@ -58,20 +60,13 @@ public class Application {
 			
 		} catch ( ClefException | IOException ce ) {
 		
-			response = new ClefResponse( VERSION, ResponseType.ERROR.toString(), SERVICE_NAME );
-			container = new ClefErrorsContainer();
-			
 			// Create a ClefError item with the exception message.
 			List<ClefItem> errors = Arrays.asList( new ClefError( ce.getMessage() ) );
 			
-			// Add the response item to the container, and the container to the response;
-			container.setAllItems( errors );
-			response.setResponseBody( container );
-			
-			
+			response = ClefResponseFactory.make( ResponseType.ERROR, errors );
 		} finally {
 			if ( response == null ) {
-				response = new ClefResponse( VERSION, ResponseType.EMPTY.toString(), SERVICE_NAME );
+				response = ClefResponseFactory.make( ResponseType.EMPTY );
 			}
 		}
 		
