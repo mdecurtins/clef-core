@@ -61,7 +61,6 @@ public class AlgorithmEnvironmentServiceImpl implements AlgorithmEnvironmentServ
 	 * @throws ClefException
 	 */
 	public AlgorithmEnvironment getAlgorithmEnvironment( String algorithmName ) throws ClefException {
-		this.printMap();
 		AlgorithmEnvironment ae = this.algorithms.get( algorithmName );
 		if ( ae == null ) {
 			throw new ClefException( "AlgorithmEnvironmentService did not find an algorithm with name: " + algorithmName );
