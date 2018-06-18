@@ -1,0 +1,12 @@
+{
+  "status": "success|fail|error",
+  "errors": [],
+  "itemsSearched": 0,
+  "results": [
+    {
+      "id": 1,
+      "filename": "",
+      "properties": {}
+    }
+  ]
+}

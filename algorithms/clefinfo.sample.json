@@ -1,0 +1,42 @@
+{
+  "algorithmAttributes": {
+    "name": "myAlgorithm",
+    "displayName": "My Human-Friendly Algorithm",
+    "datasetCapabilities": {
+      "allowedFileTypes": [ "midi", "mxml" ],
+      "monophonic": true,
+      "polyphonic": false
+    },
+    "inputCapabilities": {
+      "monophonic": true,
+      "polyphonic": false,
+      "querySizeRange": {
+        "min": 0,
+        "max": 50
+      }
+    },
+    "parameters": [
+      {
+        "description": "Parameter description for web application.",
+        "key": "parameterKey",
+        "name": "Parameter Name",
+        "type": "boolean|number|string"
+      }
+    ],
+    "queryRoute": "algorithm",
+    "type": "string|geometric"
+  },
+  "containerAttributes": {
+    "name": "clef-my-algorithm-container",
+    "networkAlias": "clef-my-container",
+    "ports": [
+      {
+        "name": "query",
+        "port": 4001
+      }
+    ]
+  },
+  "image": {
+    "name": "my-algorithm-image"
+  }
+}
