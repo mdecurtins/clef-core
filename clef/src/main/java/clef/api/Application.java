@@ -52,11 +52,12 @@ public class Application {
 			List<String> algorithms = QueryHelper.getRequestedAlgorithms( params );
 			
 			if ( algorithms.size() == 1 ) {
-				response = cs.doSearch( algorithms.get(0), params );
+				String algorithmName = algorithms.get(0);
+				Map<String, String> algorithmParams = QueryHelper.getAlgorithmParameters( algorithmName, params );
+				response = cs.doSearch( algorithmName, algorithmParams );
 			} else {
 				throw new ClefException( "Multiple algorithms not yet implemented." );
 			}
-			
 			
 		} catch ( ClefException | IOException ce ) {
 		
