@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+
 import clef.common.ClefException;
 
 public class InputCapabilities {
@@ -20,10 +22,12 @@ public class InputCapabilities {
 		this.querySize = new HashMap<String, Integer>();
 	}
 	
+	@JsonGetter("monophonic")
 	public boolean acceptsMonophonicInput() {
 		return monophonic;
 	}
 	
+	@JsonGetter("polyphonic")
 	public boolean acceptsPolyphonicInput() {
 		return polyphonic;
 	}
