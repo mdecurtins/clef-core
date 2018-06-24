@@ -1,6 +1,8 @@
 {
   "status": "success|fail|error",
-  "errors": [],
+  "errors": [
+    "A sample error message..."
+  ],
   "itemsSearched": 0,
   "results": [
     {
