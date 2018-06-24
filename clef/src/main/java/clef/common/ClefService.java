@@ -41,14 +41,23 @@ public class ClefService {
 				ae = this.aes.mergeParameterValues( ae, params );
 			}
 			
+			// Proxy the request to the given AlgorithmEnvironment and deserialize the JSON response as 
+			// an instance of AlgorithmEnvironmentResponse.
 			AlgorithmEnvironmentResponse aer = this.executeRequest( query, ae );
 			
 			List<ClefItem> items = this.mapAlgorithmResponse( aer );
 			
-			response = ClefResponseFactory.make( ResponseType.RESULT, items );
+			// Choose the response type based on the response from the AlgorithmEnvironment.
+			ResponseType rt = ( aer.getStatus().equals("success") ) ? ResponseType.RESULT : ResponseType.ERROR;
+			
+			response = ClefResponseFactory.make( rt , items );
 		} catch ( ClefException | IOException e ) {
 			List<ClefError> errs = Arrays.asList( new ClefError(e.getMessage()) );
 			response = ClefResponseFactory.make( ResponseType.ERROR, errs );
+		} finally {
+			if ( response == null ) {
+				response = ClefResponseFactory.make( ResponseType.EMPTY );
+			}
 		}
 		
 		return response;
