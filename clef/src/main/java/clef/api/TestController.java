@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -44,7 +43,7 @@ public class TestController {
 		ClefResponse response = null;
 		try {
 			algorithms = QueryHelper.getRequestedAlgorithms( params );
-			response = ClefResponseFactory.make( ResponseType.ERROR, algorithms.stream().map( s -> new ClefError(s) ).collect( Collectors.toList() ) );
+			response = ClefResponseFactory.make( ResponseType.ERROR, ClefError.fromStrings( algorithms ) );
 		} catch (ClefException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
