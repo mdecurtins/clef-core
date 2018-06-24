@@ -11,6 +11,7 @@ public interface AlgorithmEnvironmentService {
 
 	public AlgorithmEnvironment getAlgorithmEnvironment( String algorithmName ) throws ClefException;
 	public List<Path> getDefinedAlgorithms() throws ClefException;
+	public List<String> listAlgorithmNames();
 	public AlgorithmEnvironment mergeParameterValues( AlgorithmEnvironment ae, Map<String, String> params );
 	
 }
