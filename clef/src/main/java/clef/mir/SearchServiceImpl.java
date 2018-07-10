@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.*;
 import java.util.List;
-import java.util.Map;
 
 import clef.mir.clefinfo.Parameter;
 
@@ -15,7 +14,12 @@ public class SearchServiceImpl implements SearchService {
 
 	
 	/**
+	 * Gets the response body from the HTTP connection.
 	 * 
+	 * The response body is expected to be a JSON-formatted string conforming to the 
+	 * specification for responses from Clef algorithm containers.
+	 * 
+	 * @since 1.0.0
 	 * @param conn
 	 * @return
 	 */
@@ -57,8 +61,14 @@ public class SearchServiceImpl implements SearchService {
 	
 	
 	/**
+	 * Gets an HTTP connection specific to the algorithm environment {@code ae}.
 	 * 
-	 * @param ae
+	 * There is currently no specification for Clef algorithm containers to accept GET requests,
+	 * or for this service to process responses to such requests. This method creates 
+	 * an HTTP POST request with Content-Type: application/xml.
+	 * 
+	 * @since 1.0.0
+	 * @param ae the algorithm container to which a request should be proxied.
 	 * @return
 	 */
 	private HttpURLConnection getConnection( AlgorithmEnvironment ae ) {
@@ -66,11 +76,16 @@ public class SearchServiceImpl implements SearchService {
 		ContainerAttributes ca = ae.getContainerAttributes();
 		URL url = null;
 		HttpURLConnection conn = null;
+		String parameters = "";
 		try {
-			// Construct a URL of the form http://algorithm-container-network-alias:queryPort
-			url = new URL( "http://" + ca.getNetworkAlias() + ":" + ca.getQueryPort().getPort() + aa.getQueryRoute() );
+			// Get the parameter string for this algorithm environment.
+			parameters = getParameterString( ae.getAlgorithmAttributes() );
+			// Construct a URL of the form http://algorithm-container-network-alias:queryPort[?param=value&param=value...]
+			url = new URL( "http://" + ca.getNetworkAlias() + ":" + ca.getQueryPort().getPort() + aa.getQueryRoute() + parameters );
 		} catch ( MalformedURLException mue ) {
 			mue.printStackTrace();
+		} catch ( UnsupportedEncodingException uee ) {
+			uee.printStackTrace();
 		}
 		
 		if ( url != null ) {
@@ -81,10 +96,20 @@ public class SearchServiceImpl implements SearchService {
 			}
 		}
 		
+		// This will be a POST request.
 		try {
 			conn.setRequestMethod( "POST" );
 		} catch ( ProtocolException pe ) {
 			pe.printStackTrace();
+		}
+		
+		// Declare that this request will have an XML payload.
+		try {
+			conn.setRequestProperty( "Content-Type", "application/xml" );
+		} catch ( IllegalStateException ise ) {
+			ise.printStackTrace();
+		} catch ( NullPointerException npe ) {
+			npe.printStackTrace();
 		}
 		
 		return conn;
@@ -93,12 +118,11 @@ public class SearchServiceImpl implements SearchService {
 	
 	/**
 	 * 
-	 * @param q
 	 * @param aa
 	 * @return
 	 * @throws UnsupportedEncodingException
 	 */
-	public static String getParameterString( String q, AlgorithmAttributes aa ) throws UnsupportedEncodingException {
+	private static String getParameterString( AlgorithmAttributes aa ) throws UnsupportedEncodingException {
 		
 		List<Parameter> params = aa.getParameters();
 		
@@ -107,55 +131,36 @@ public class SearchServiceImpl implements SearchService {
 		// Append the URL path/parameter delimiter.
 		paramString.append( "?" );
 		
-		// Append the query parameter.
-		paramString.append( "q=" );
-		paramString.append( q );
-		
+		boolean first = true;
 		for ( Parameter p : params ) {
 			if ( p.getValue() == null ) {
 				continue;
 			}
-			paramString.append( "&" );
-			paramString.append( URLEncoder.encode( p.getKey(), "UTF-8") );
+			if ( ! first ) {
+				paramString.append( "&" );
+			}
+			paramString.append( URLEncoder.encode( p.getKey(), "UTF-8" ) );
 			paramString.append( "=" );
 			paramString.append( URLEncoder.encode( p.getValue().toString(), "UTF-8" ) );
+			first = false;
 		}
 		
-		return paramString.toString();
+		// If there are no parameters, paramString will consist of a lonely "?" only.
+		return ( paramString.toString().equals( "?" ) ) ? "" : paramString.toString();
 	}
 	
-	
-	private void printConnectionProperties( HttpURLConnection conn ) {
-		Map<String, List<String>> props = conn.getRequestProperties();
-		System.out.println( "Connection Properties:" );
-		for ( Map.Entry<String, List<String>> prop : props.entrySet() ) {
-			System.out.println( "Property: " + prop.getKey() );
-			System.out.println( "Values:" );
-			for ( String val : prop.getValue() ) {
-				System.out.println( "\t" + val );
-			}
-		}
-	}
 	
 	/**
 	 * 
-	 * @param q
+	 * @since 1.0.0
 	 * @param ae
-	 * @return
+	 * @param musicxml
+	 * @return 
 	 */
-	public String query( String q, AlgorithmEnvironment ae ) {
+	public String query( AlgorithmEnvironment ae, String musicxml ) {
 	
 		HttpURLConnection conn = this.getConnection( ae );
-		
-		String parameters = "";
-		try {
-			parameters = getParameterString( q, ae.getAlgorithmAttributes() );
-			System.out.println( "Sending request to: " + conn.getURL().toExternalForm() + parameters );
-			this.sendRequest( conn, parameters );
-			
-		} catch ( UnsupportedEncodingException uee ) {
-			uee.printStackTrace();
-		}
+		this.sendRequest( conn, musicxml );
 		
 		return this.extractResponse( conn );
 	}
@@ -169,17 +174,17 @@ public class SearchServiceImpl implements SearchService {
 	 * @param conn
 	 * @param paramString
 	 */
-	private void sendRequest( HttpURLConnection conn, String paramString ) {
+	private void sendRequest( HttpURLConnection conn, String musicxml ) {
 		
 		conn.setDoOutput( true );
 		
 		DataOutputStream dos = null;
 		
-		// Write the parameters string to the connection and send the request.
+		// Write the MusicXML string to the connection and send the request.
 		try {
 			dos = new DataOutputStream( conn.getOutputStream() );
 			
-			dos.writeBytes( paramString );
+			dos.writeBytes( musicxml );
 			
 			dos.flush();
 			dos.close();
