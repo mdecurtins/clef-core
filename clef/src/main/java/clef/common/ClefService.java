@@ -29,12 +29,11 @@ public class ClefService {
 		this.ss = new SearchServiceImpl();
 	}
 	
-	public ClefResponse doSearch( String algorithm, Map<String, String> params ) {
+	public ClefResponse doSearch( String algorithm, Map<String, String> params, String query ) {
 		
 		ClefResponse response = null;
 		
 		try {
-			String query = this.getQueryString( params );
 			
 			AlgorithmEnvironment ae = this.aes.getAlgorithmEnvironment( algorithm );
 			if ( ae != null ) {
@@ -74,9 +73,6 @@ public class ClefService {
 		return aer;
 	}
 	
-	private String getQueryString( Map<String, String> params ) {
-		return params.get( "q" );
-	}
 	
 	private List<ClefItem> mapAlgorithmResponse( AlgorithmEnvironmentResponse aer ) {
 		List<ClefItem> items = new ArrayList<ClefItem>();
