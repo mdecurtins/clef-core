@@ -9,6 +9,8 @@ import java.util.Set;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,8 +36,8 @@ public class Application {
 		return "Welcome to the " + SERVICE_NAME;
 	}
 	
-	@RequestMapping(value = "/search", method = RequestMethod.POST)
-	public ClefResponse doSearch( @RequestParam Map<String, String> params ) {
+	@RequestMapping(value = "/search", method = RequestMethod.POST, consumes = MediaType.APPLICATION_XML_VALUE )
+	public ClefResponse doSearch( @RequestParam Map<String, String> params, @RequestBody String musicxml ) {
 		
 		// Prepare the response and the container for the response items.
 		ClefResponse response = null;
@@ -43,7 +45,7 @@ public class Application {
 		try {
 			ClefService cs = new ClefService();
 			
-			Set<String> required = new HashSet<String>( Arrays.asList( "q", "algorithms" ) );
+			Set<String> required = new HashSet<String>( Arrays.asList( "algorithms" ) );
 			boolean ok = QueryHelper.checkRequiredParameters( params, required );
 			if ( ! ok ) {
 				throw new ClefException( "One or more required parameters missing" ); 
@@ -54,7 +56,7 @@ public class Application {
 			if ( algorithms.size() == 1 ) {
 				String algorithmName = algorithms.get(0);
 				Map<String, String> algorithmParams = QueryHelper.getAlgorithmParameters( algorithmName, params );
-				response = cs.doSearch( algorithmName, algorithmParams );
+				response = cs.doSearch( algorithmName, algorithmParams, musicxml );
 			} else {
 				throw new ClefException( "Multiple algorithms not yet implemented." );
 			}
