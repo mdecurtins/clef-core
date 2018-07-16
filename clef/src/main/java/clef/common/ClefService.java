@@ -66,10 +66,10 @@ public class ClefService {
 		//String query = this.getQueryString( params );
 	}
 	
-	private AlgorithmEnvironmentResponse executeRequest( String q, AlgorithmEnvironment ae ) throws IOException {
+	private AlgorithmEnvironmentResponse executeRequest( String musicxml, AlgorithmEnvironment ae ) throws IOException {
 		AlgorithmEnvironmentResponse aer = null;
 		ObjectMapper mapper = new ObjectMapper();
-		aer = mapper.readValue( this.ss.query(q, ae), AlgorithmEnvironmentResponse.class );
+		aer = mapper.readValue( this.ss.query(ae, musicxml), AlgorithmEnvironmentResponse.class );
 		return aer;
 	}
 	
