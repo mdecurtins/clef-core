@@ -1,5 +1,5 @@
 {
-  "status": "success|fail|error",
+  "status": "success|error",
   "errors": [
     "A sample error message..."
   ],
@@ -7,8 +7,11 @@
   "results": [
     {
       "id": 1,
-      "filename": "",
-      "properties": {}
+      "filename": "mozart-requiem-kyrie.krn",
+      "properties": {
+        "userDefined1": "A user-defined result property",
+        "userDefined2": "Another user-defined result property"
+      }
     }
   ]
 }
