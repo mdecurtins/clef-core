@@ -1,3 +1,0 @@
-LABEL clef_algorithm_name="Mongeau Sankoff"
-LABEL clef_container_name="mongeau_sankoff"
-LABEL clef_foo="bar" clef_bar="baz"
