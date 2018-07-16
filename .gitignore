@@ -3,3 +3,6 @@
 .mvn/
 .recommenders/
 .project
+algorithms/*
+
+!algorithms/*.json
