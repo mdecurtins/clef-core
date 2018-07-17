@@ -1,0 +1,14 @@
+{
+  "datasetAttributes": {
+    "capabilities": {
+      "monophonic": true,
+      "polyphonic": false
+    },
+    "displayName": "My Dataset",
+    "format": "",
+    "itemCount": 200,
+    "name": "my-dataset"
+  },
+  "collection": "MuseData, IMSLP, Essen",
+  "tags": []
+}
