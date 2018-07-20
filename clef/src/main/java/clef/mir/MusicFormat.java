@@ -1,7 +1,7 @@
 package clef.mir;
 
 public enum MusicFormat {
-	HUMDRUM ( "kern" ),
+	HUMDRUM ( "humdrum" ),
 	JSON ( "json" ),
 	MIDI ( "midi" ),
 	MUSICXML ( "musicxml" );
