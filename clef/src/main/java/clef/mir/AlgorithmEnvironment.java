@@ -9,8 +9,6 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import clef.mir.clefinfo.Parameter;
-
 public class AlgorithmEnvironment {
 
 	private AlgorithmAttributes aa;
@@ -86,31 +84,5 @@ public class AlgorithmEnvironment {
 	public void setImage( Map<String, Object> img ) {
 		this.image = (String) img.get( "name" );
 	}
-	
-	public void print() {
-		System.out.println( "Algorithm Attributes:" );
-		System.out.println( "Name: " + this.aa.getName() );
-		System.out.println( "Display Name: " + this.aa.getDisplayName() );
-		System.out.println( "Query Route: " + this.aa.getQueryRoute() );
-		System.out.println( "Type: " + this.aa.getType() );
-		System.out.println( "Dataset Capabilities: " );
-		System.out.println( "Monophonic: " + this.aa.getDatasetCapabilities().isMonophonicData() );
-		System.out.println( "Polyphonic: " + this.aa.getDatasetCapabilities().isPolyphonicData() );
-		System.out.println( "Allowed File Types: " + this.aa.getDatasetCapabilities().getAllowedFileTypes() );
-		System.out.println( "Input Capabilities:" );
-		System.out.println( "Monophonic: " + this.aa.getInputCapabilities().acceptsMonophonicInput() );
-		System.out.println( "Polyphonic: " + this.aa.getInputCapabilities().acceptsPolyphonicInput() );
-		System.out.println( "Query Size Range: Min: " + this.aa.getInputCapabilities().getQuerySizeMin() + " Max: " + this.aa.getInputCapabilities().getQuerySizeMax());
-		System.out.println( "Parameters:" );
-		for ( Parameter p : this.aa.getParameters() ) {
-			System.out.println( "Description: " + p.getDescription() );
-			System.out.println( "Name: " + p.getName() );
-			System.out.println( "Keyname: " + p.getKey() );
-			System.out.println( "Type: " + p.getType() );
-		}
-		System.out.println( "Container Attributes: " );
-		System.out.println( "Name: " + this.ca.getName() );
-		System.out.println( "Network Alias: " + this.ca.getNetworkAlias() );
-		System.out.println( "Query port: " + this.ca.getQueryPort().getPort() );
-	}
+
 }
