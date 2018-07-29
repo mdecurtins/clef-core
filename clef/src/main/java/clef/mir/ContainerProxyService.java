@@ -1,6 +1,6 @@
 package clef.mir;
 
-public interface SearchService {
+public interface ContainerProxyService {
 	
-	public String query( AlgorithmEnvironment ae, String musicxml );
+	public String query( Query q );
 }
