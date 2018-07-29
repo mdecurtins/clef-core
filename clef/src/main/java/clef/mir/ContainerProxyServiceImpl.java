@@ -6,11 +6,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.*;
+import java.util.LinkedList;
 import java.util.List;
 
 import clef.mir.clefinfo.Parameter;
 
-public class SearchServiceImpl implements SearchService {
+public class ContainerProxyServiceImpl implements ContainerProxyService {
 
 	
 	/**
@@ -60,6 +61,13 @@ public class SearchServiceImpl implements SearchService {
 	}
 	
 	
+	private String getBaseURL( Query q ) {
+		AlgorithmAttributes aa = q.getAlgorithmEnvironment().getAlgorithmAttributes();
+		ContainerAttributes ca = q.getAlgorithmEnvironment().getContainerAttributes();
+		return "http://" + ca.getNetworkAlias() + ":" + ca.getQueryPort().getContainerPort() + aa.getQueryRoute();
+	}
+	
+	
 	/**
 	 * Gets an HTTP connection specific to the algorithm environment {@code ae}.
 	 * 
@@ -71,17 +79,16 @@ public class SearchServiceImpl implements SearchService {
 	 * @param ae the algorithm container to which a request should be proxied.
 	 * @return
 	 */
-	private HttpURLConnection getConnection( AlgorithmEnvironment ae ) {
-		AlgorithmAttributes aa = ae.getAlgorithmAttributes();
-		ContainerAttributes ca = ae.getContainerAttributes();
+	private HttpURLConnection getConnection( Query q ) {
+		
 		URL url = null;
 		HttpURLConnection conn = null;
 		String parameters = "";
 		try {
 			// Get the parameter string for this algorithm environment.
-			parameters = getParameterString( ae.getAlgorithmAttributes() );
+			parameters = getParameterString( q );
 			// Construct a URL of the form http://algorithm-container-network-alias:queryPort[?param=value&param=value...]
-			url = new URL( "http://" + ca.getNetworkAlias() + ":" + ca.getQueryPort().getPort() + aa.getQueryRoute() + parameters );
+			url = new URL( this.getBaseURL( q ) + parameters );
 		} catch ( MalformedURLException mue ) {
 			mue.printStackTrace();
 		} catch ( UnsupportedEncodingException uee ) {
@@ -118,36 +125,43 @@ public class SearchServiceImpl implements SearchService {
 	
 	/**
 	 * 
-	 * @param aa
+	 * @since 1.0.0
+	 * @param q
 	 * @return
 	 * @throws UnsupportedEncodingException
 	 */
-	private static String getParameterString( AlgorithmAttributes aa ) throws UnsupportedEncodingException {
+	private static String getParameterString( Query q ) throws UnsupportedEncodingException {
 		
+		AlgorithmAttributes aa = q.getAlgorithmEnvironment().getAlgorithmAttributes();
 		List<Parameter> params = aa.getParameters();
+		List<String> kvpairs = new LinkedList<String>();
 		
-		StringBuilder paramString = new StringBuilder();
+		// Assume for now that we are working with a monophonic query.
+		MonophonicQuery mq = (MonophonicQuery) q;
 		
-		// Append the URL path/parameter delimiter.
-		paramString.append( "?" );
-		
-		boolean first = true;
 		for ( Parameter p : params ) {
 			if ( p.getValue() == null ) {
 				continue;
 			}
-			if ( ! first ) {
-				paramString.append( "&" );
-			}
+			
+			StringBuilder paramString = new StringBuilder();
+			
 			paramString.append( URLEncoder.encode( p.getKey(), "UTF-8" ) );
 			paramString.append( "=" );
 			paramString.append( URLEncoder.encode( p.getValue().toString(), "UTF-8" ) );
-			first = false;
+			kvpairs.add( paramString.toString() );
 		}
 		
-		// If there are no parameters, paramString will consist of a lonely "?" only.
-		return ( paramString.toString().equals( "?" ) ) ? "" : paramString.toString();
+		// Suffix the staff index parameter. This parameter provides a direct way for monophonic queries to 
+		// indicate which staff of the MusicXML contains the query input notation.
+		String staffIdxParam = "staffIdx=" +  mq.getStaffIndex();
+		kvpairs.add( staffIdxParam );
+		
+		// Return the ? URL delimiter followed by the kvpairs, joined by the & character.
+		return String.format( "?%s", String.join( "&", kvpairs ) );
 	}
+	
+	
 	
 	
 	/**
@@ -157,10 +171,10 @@ public class SearchServiceImpl implements SearchService {
 	 * @param musicxml
 	 * @return 
 	 */
-	public String query( AlgorithmEnvironment ae, String musicxml ) {
+	public String query( Query q ) {
 	
-		HttpURLConnection conn = this.getConnection( ae );
-		this.sendRequest( conn, musicxml );
+		HttpURLConnection conn = this.getConnection( q );
+		this.sendRequest( conn, q.getMusicXML() );
 		
 		return this.extractResponse( conn );
 	}
@@ -189,9 +203,8 @@ public class SearchServiceImpl implements SearchService {
 			dos.flush();
 			dos.close();
 		} catch ( IOException ioe ) {
-			
 			ioe.printStackTrace();
 		}
-		
+		System.out.println( "Successfully sent request.");
 	}
 }
