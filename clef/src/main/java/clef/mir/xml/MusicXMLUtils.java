@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -30,11 +31,18 @@ public class MusicXMLUtils {
 		return ( nl.getLength() > 0 );
 	}
 	
+	public static void getDistinctOffsets( String musicxml ) {
+		
+	}
+	
 	private static Document getDocument( String musicxml ) {
 		Document doc = null;
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		try {
 			DocumentBuilder db = dbf.newDocumentBuilder();
+			
+			db.setEntityResolver( new ClefEntityResolver() );
+			
 			doc = db.parse( new InputSource( new StringReader(musicxml) ) );
 		} catch ( ParserConfigurationException pce ) {
 			pce.printStackTrace();
@@ -50,6 +58,10 @@ public class MusicXMLUtils {
 	public static int getMonophonicInputStaffIndex( String musicxml ) {
 		
 		List<Integer> staves = staffNumbersByNote( musicxml );
+		
+		if ( staves != null && staves.isEmpty() ) {
+			return 0;
+		}
 		
 		return staves.get( 0 );
 	}
@@ -105,10 +117,38 @@ public class MusicXMLUtils {
 					}
 				}
 			}
+		} else {
+			System.out.println( "staffNumbersByNote: Document is null" );
 		}
 		return values;
 	}
 	
-	
+	public static List<Node> trimTrailingRests( String musicxml, int staffIdx ) {
+		String xpath = String.format( "//note[staff=%d]", staffIdx );
+		NodeList nl = getNodesWhere( getDocument( musicxml ), xpath );
+		List<Node> trimmed = new LinkedList<Node>();
+		if ( nl.getLength() > 0 ) {
+			// Starting at the last node, work backwards.
+			int i;
+			for ( i = nl.getLength(); i > 0; i-- ) {
+				Node n = nl.item( i );
+				if ( n.getNodeType() == Node.ELEMENT_NODE ) {
+					Element el = (Element) n;
+					if ( el.getElementsByTagName( "rest" ).getLength() != 0 ) {
+						// This <note> contains a <rest/> element; keep going.
+						continue;
+					} else {
+						// This <note> is not a rest; stop iteration.
+						break;
+					}
+				}
+			}
+			// Starting at the beginning, work forwards until the ith node.
+			for ( int j = 0; j < i; j++ ) {
+				trimmed.add( nl.item( j ) );
+			}
+		}
+		return trimmed;
+	}
 	
 }
