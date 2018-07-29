@@ -2,10 +2,8 @@ package clef.api;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -20,7 +18,6 @@ import clef.api.domain.*;
 import clef.api.domain.response.ClefResponse;
 import clef.api.domain.response.ClefResponseFactory;
 import clef.api.domain.response.ResponseType;
-import clef.api.utility.QueryHelper;
 import clef.common.ClefException;
 import clef.common.ClefService;
 
@@ -45,21 +42,7 @@ public class Application {
 		try {
 			ClefService cs = new ClefService();
 			
-			Set<String> required = new HashSet<String>( Arrays.asList( "algorithms" ) );
-			boolean ok = QueryHelper.checkRequiredParameters( params, required );
-			if ( ! ok ) {
-				throw new ClefException( "One or more required parameters missing" ); 
-			}
-			
-			List<String> algorithms = QueryHelper.getRequestedAlgorithms( params );
-			
-			if ( algorithms.size() == 1 ) {
-				String algorithmName = algorithms.get(0);
-				Map<String, String> algorithmParams = QueryHelper.getAlgorithmParameters( algorithmName, params );
-				response = cs.doSearch( algorithmName, algorithmParams, musicxml );
-			} else {
-				throw new ClefException( "Multiple algorithms not yet implemented." );
-			}
+			response = cs.doSearch( params, musicxml );
 			
 		} catch ( ClefException | IOException ce ) {
 		
