@@ -4,5 +4,6 @@
 .recommenders/
 .project
 algorithms/*
+*.dtd
 
 !algorithms/*.json
