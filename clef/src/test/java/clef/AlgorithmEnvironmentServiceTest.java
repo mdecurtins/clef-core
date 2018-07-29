@@ -44,10 +44,7 @@ public class AlgorithmEnvironmentServiceTest {
 				AlgorithmEnvironment ae = AlgorithmEnvironment.fromFile( found.get(0) );
 				
 				Assert.assertNotNull( ae );
-				
-				if ( ae != null ) {
-					ae.print();
-				}
+
 			} catch ( IOException ioe ) {
 				ioe.printStackTrace();
 			}
