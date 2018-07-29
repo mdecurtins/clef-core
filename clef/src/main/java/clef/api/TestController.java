@@ -42,7 +42,7 @@ public class TestController {
 		List<String> algorithms;
 		ClefResponse response = null;
 		try {
-			algorithms = QueryHelper.getRequestedAlgorithms( params );
+			algorithms = QueryHelper.getCSVParameterValues( "algorithms", params ); 
 			response = ClefResponseFactory.make( ResponseType.ERROR, ClefError.fromStrings( algorithms ) );
 		} catch (ClefException e) {
 			// TODO Auto-generated catch block
