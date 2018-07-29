@@ -3,21 +3,30 @@ package clef.mir.clefinfo;
 public class Port {
 
 	private String name;
-	private int port;
+	private int containerPort;
+	private int hostPort;
 	
 	public String getName() {
 		return name;
 	}
 	
-	public int getPort() {
-		return port;
+	public int getContainerPort() {
+		return containerPort;
+	}
+	
+	public int getHostPort() {
+		return hostPort;
 	}
 	
 	public void setName( String n ) {
 		this.name = n;
 	}
 	
-	public void setPort( int p ) {
-		this.port = p;
+	public void setContainerPort( int p ) {
+		this.containerPort = p;
+	}
+	
+	public void setHostPort( int p ) {
+		this.hostPort = p;
 	}
 }
