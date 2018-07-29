@@ -8,6 +8,12 @@ import java.util.Set;
 
 import clef.common.ClefException;
 
+/**
+ * A utility class to help with checking and extracting parameters received in a request URL.
+ * 
+ * @author Max DeCurtins
+ * @since 1.0.0
+ */
 public class QueryHelper {
 
 	
@@ -16,6 +22,7 @@ public class QueryHelper {
 	 * 
 	 * This method checks only for the existence of the required parameter keynames; it does not check values.
 	 * 
+	 * @since 1.0.0
 	 * @param requestParams
 	 * @param required
 	 * @return true if all required parameters exist in requestParams, false otherwise.
@@ -26,35 +33,11 @@ public class QueryHelper {
 	
 	
 	/**
-	 * Gets the names of algorithms that the user has requested to be run.
-	 * 
-	 * Algorithm names are expected to be passed as a comma-separated list in the URL in the form: algorithms=name1[,...nameN] with no spaces.
-	 * 
-	 * @param requestParams
-	 * @return the names of the algorithms that the user has requested to be run.
-	 */
-	public static List<String> getRequestedAlgorithms( Map<String, String> requestParams ) throws ClefException {
-		List<String> algorithms = null;
-		String[] algorithmNames = null;
-		String parameterValue = null;
-		if ( ( parameterValue = requestParams.get( "algorithms" ) ) != null ) {
-			algorithmNames = parameterValue.split( "," );
-			algorithms = Arrays.asList( algorithmNames );
-		}
-		
-		if ( algorithms.isEmpty() ) {
-			throw new ClefException( "You must specify at least one algorithm to run." );
-		}
-		
-		return algorithms;
-	}
-	
-	
-	/**
 	 * Gets parameters and their values for a specific algorithm.
 	 * 
 	 * Algorithm-specific parameters are expected to be passed in the URL in the form: algorithm-name$parameter-name=value with no spaces.
 	 * 
+	 * @since 1.0.0
 	 * @param algorithmName
 	 * @param requestParams
 	 * @return parameter-value pairs for parameters specific to this algorithm
@@ -70,5 +53,31 @@ public class QueryHelper {
 			}
 		}
 		return params;
+	}
+	
+	
+	/**
+	 * Gets the values from a URL parameter key whose value is a CSV string.
+	 * 
+	 * Values are expected to be passed as a comma-separated list in the URL in the form: parameterName=value1[,...valueN] with no spaces.
+	 * 
+	 * @since 1.0.0
+	 * @param requestParams a map of KV pairs generated from the request URL
+	 * @return the names of the algorithms that the user has requested to be run.
+	 */
+	public static List<String> getCSVParameterValues( String parameterName, Map<String, String> requestParams ) throws ClefException {
+		List<String> vals = null;
+		String[] splitVals = null;
+		String parameterValue = null;
+		if ( ( parameterValue = requestParams.get( parameterName ) ) != null ) {
+			splitVals = parameterValue.split( "," );
+			vals = Arrays.asList( splitVals );
+		}
+		
+		if ( vals.isEmpty() ) {
+			throw new ClefException( "Could not retrieve CSV values for parameter: " + parameterName );
+		}
+		
+		return vals;
 	}
 }
