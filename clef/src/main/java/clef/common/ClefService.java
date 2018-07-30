@@ -14,11 +14,11 @@ import java.util.Set;
 import clef.api.domain.*;
 import clef.api.domain.response.*;
 import clef.api.utility.QueryHelper;
+import clef.common.datamodel.*;
 import clef.mir.*;
 import clef.mir.dataset.Dataset;
 import clef.mir.dataset.DatasetService;
 import clef.mir.dataset.DatasetServiceImpl;
-import clef.common.music.datamodel.*;
 
 /**
  * 

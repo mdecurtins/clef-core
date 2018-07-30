@@ -1,4 +1,4 @@
-package clef.common.music.datamodel;
+package clef.common.datamodel;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 

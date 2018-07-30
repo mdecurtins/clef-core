@@ -2,8 +2,8 @@ package clef.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import clef.common.music.datamodel.Composer;
-import clef.common.music.datamodel.Work;
+import clef.common.datamodel.Composer;
+import clef.common.datamodel.Work;
 
 import java.util.List;
 
