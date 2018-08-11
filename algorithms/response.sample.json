@@ -7,6 +7,7 @@
   "results": [
     {
       "id": 1,
+      "datasetName": "my-dataset",
       "filename": "mozart-requiem-kyrie.krn",
       "properties": {
         "userDefined1": "A user-defined result property",
