@@ -1,16 +1,19 @@
-package clef.common.datamodel;
+package clef.datamodel;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Work {
+public class Work extends ClefDataObject {
 
 	private String catalog;
 	private String catalog_number;
+	private int composerId;
 	private String composition_date;
 	private String era;
+	private int eraId;
 	private String title;
 	private String type;
+	private int workTypeId;
 	
 	public Work() {
 		
@@ -32,8 +35,16 @@ public class Work {
 		return composition_date;
 	}
 	
+	public int getComposerId() {
+		return composerId;
+	}
+	
 	public String getEra() {
 		return era;
+	}
+	
+	public int getEraId() {
+		return eraId;
 	}
 	
 	public String getTitle() {
@@ -42,6 +53,10 @@ public class Work {
 	
 	public String getType() {
 		return type;
+	}
+	
+	public int getWorkTypeId() {
+		return workTypeId;
 	}
 	
 	public void setCatalog( String c ) {

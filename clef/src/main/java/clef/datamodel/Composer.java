@@ -1,4 +1,4 @@
-package clef.common.datamodel;
+package clef.datamodel;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Composer {
+public class Composer extends ClefDataObject {
 
 	private String name;
 	private Map<String, String> dates;
@@ -26,9 +26,26 @@ public class Composer {
 		this.setDates( born, died );
 	}
 	
+	public int born() {
+		String born = this.dates.get( "born" );
+		if ( born != null ) {
+			return Integer.parseInt( born );
+		}
+		return -1;
+	}
+	
+	public int died() {
+		String died = this.dates.get( "died" );
+		if ( died != null ) {
+			return Integer.parseInt( died );
+		}
+		return -1;
+	}
+	
 	public String getName() {
 		return name;
 	}
+	
 	
 	public Map<String, String> getDates() {
 		return dates;
