@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import clef.common.ClefException;
 import clef.mir.dataset.Dataset;
+import clef.mir.xml.MusicXMLUtils;
 
 public abstract class Query {
 
@@ -37,6 +38,9 @@ public abstract class Query {
 		return musicxml;
 	}
 	
+	public static int getQueryType( String musicxml ) {
+		return ( MusicXMLUtils.musicIsOnOneStaff( musicxml ) ) ? MONOPHONIC : POLYPHONIC;
+	}
 	
 	public boolean queryRangeOk() {
 		boolean ok = false;
