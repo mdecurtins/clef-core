@@ -2,11 +2,16 @@ package clef.mir;
 
 import java.util.List;
 import java.util.Map;
-import java.nio.file.Path;
 
 import clef.common.ClefException;
 import clef.mir.AlgorithmEnvironment;
 
+/**
+ * Simple interface for algorithm environment service operations.
+ * 
+ * @author Max DeCurtins
+ * @since 1.0.0
+ */
 public interface AlgorithmEnvironmentService {
 
 	public AlgorithmEnvironment getAlgorithmEnvironment( String algorithmName ) throws ClefException;
