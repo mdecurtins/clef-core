@@ -5,9 +5,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import java.util.Map;
+import java.util.function.Predicate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import clef.utility.CheckedFunction;
 
 public class AlgorithmEnvironment {
 
@@ -15,6 +19,11 @@ public class AlgorithmEnvironment {
 	private ContainerAttributes ca;
 	private String image;
 	
+	@JsonIgnore
+	private static final Predicate<Path> isClefinfoFile = path -> path.toAbsolutePath().toString().endsWith( "clefinfo.json" );
+	
+	@JsonIgnore
+	private static final CheckedFunction<Path, AlgorithmEnvironment> createAlgorithmEnvironment = path -> AlgorithmEnvironment.fromFile( path );
 	
 	/**
 	 * 
@@ -50,6 +59,12 @@ public class AlgorithmEnvironment {
 	}
 	
 	
+	@JsonProperty
+	public static CheckedFunction<Path, AlgorithmEnvironment> getCreatorFunction() {
+		return createAlgorithmEnvironment;
+	}
+	
+	
 	/**
 	 * 
 	 * @return
@@ -58,6 +73,10 @@ public class AlgorithmEnvironment {
 		return image;
 	}
 	
+	@JsonProperty
+	public static Predicate<Path> getPredicate() {
+		return isClefinfoFile;
+	}
 	
 	/**
 	 * 
