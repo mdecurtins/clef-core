@@ -2,11 +2,13 @@ package clef.datamodel.metadata.parsers;
 
 import clef.datamodel.*;
 import clef.datamodel.metadata.Metadata;
+import clef.utility.CheckedFunction;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,6 +19,18 @@ import java.util.regex.Pattern;
  * @since 1.0.0
  */
 public class Humdrum {
+	
+	private static final Predicate<Path> isHumdrumFile = path -> path.toAbsolutePath().toString().endsWith( ".krn" );
+	
+	private static final CheckedFunction<Path, Metadata> createMetadata = path -> Humdrum.parse( path );
+	
+	public static Predicate<Path> getPredicate() {
+		return isHumdrumFile;
+	}
+	
+	public static CheckedFunction<Path, Metadata> getCreatorFunction() {
+		return createMetadata;
+	}
 
 	public static Metadata parse( Path p ) throws IOException {
 		
