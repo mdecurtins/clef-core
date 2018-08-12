@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
 public class ClefNotImplementedException extends ClefException {
 
+	private static final long serialVersionUID = 2018_08_12_001L;
+	
 	public ClefNotImplementedException( String msg ) {
 		super( msg );
 	}
