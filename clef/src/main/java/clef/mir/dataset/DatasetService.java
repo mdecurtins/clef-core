@@ -26,12 +26,7 @@ public interface DatasetService {
 	 */
 	public Dataset getDataset( String name ) throws ClefException;
 	
-	/**
-	 * 
-	 * @return
-	 * @throws ClefException
-	 */
-	public List<Path> getDefinedDatasetPaths() throws ClefException;
+
 	
 	/**
 	 * 

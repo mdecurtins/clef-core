@@ -13,6 +13,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
 import clef.common.ClefException;
+import clef.utility.FileHandler;
 
 public class DatasetServiceImpl implements DatasetService {
 
@@ -24,14 +25,18 @@ public class DatasetServiceImpl implements DatasetService {
 	private DatasetServiceImpl() throws ClefException, IOException {
 		this.datasets = new HashMap<String, Dataset>();
 		
-		List<Path> datasetPaths = this.getDefinedDatasetPaths();
+		String datasetsPath = System.getenv( ENV_DATASETS_DIR );
 		
-		if ( datasetPaths.isEmpty() ) {
+		List<Dataset> dsets = new ArrayList<Dataset>();
+		if ( datasetsPath != null && ! datasetsPath.equals( "" ) ) {
+			dsets = FileHandler.traversePath( datasetsPath, Dataset.getPredicate(), Dataset.getCreatorFunction() );
+		}
+		
+		if ( dsets.isEmpty() ) {
 			throw new ClefException( "DatasetService: no clefdataset.json files within the datasets directory tree." );
 		}
 		
-		for ( Path path : datasetPaths ) {
-			Dataset dset = Dataset.fromFile( path );
+		for ( Dataset dset : dsets ) {
 			if ( dset instanceof Dataset ) {
 				this.datasets.put( dset.getDatasetAttributes().getName(), dset );
 			} else {
@@ -60,33 +65,6 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 	
 	
-	public List<Path> getDefinedDatasetPaths() throws ClefException {
-		List<Path> clefdatasetPaths = new ArrayList<Path>();
-		
-		String datasetsPath = System.getenv( ENV_DATASETS_DIR );
-		if ( datasetsPath == null ) {
-			throw new ClefException( "Environment variable " + ENV_DATASETS_DIR + " is not defined or could not be retrieved." );
-		}
-		
-		Path p = FileSystems.getDefault().getPath( datasetsPath );
-		
-		try {
-			Files.walkFileTree( p, new SimpleFileVisitor<Path>() {
-				@Override
-				public FileVisitResult visitFile( Path file, BasicFileAttributes attrs ) throws IOException {
-					String absoluteFilename = file.toAbsolutePath().toString();
-					if ( absoluteFilename.endsWith( "clefdataset.json" ) ) {
-						clefdatasetPaths.add( file.toAbsolutePath() );
-					}
-					return FileVisitResult.CONTINUE;
-				}
-			});
-		} catch ( IOException ioe ) {
-			ioe.printStackTrace();
-		}
-		
-		return clefdatasetPaths;
-	}
 	
 	public static DatasetService getInstance() throws ClefException, IOException {
 		if ( instance == null ) {

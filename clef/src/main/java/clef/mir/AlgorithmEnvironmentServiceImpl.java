@@ -1,12 +1,6 @@
 package clef.mir;
 
 import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +8,7 @@ import java.util.HashMap;
 
 import clef.common.ClefException;
 import clef.mir.clefinfo.Parameter;
+import clef.utility.FileHandler;
 
 
 public class AlgorithmEnvironmentServiceImpl implements AlgorithmEnvironmentService {
@@ -35,15 +30,19 @@ public class AlgorithmEnvironmentServiceImpl implements AlgorithmEnvironmentServ
 	private AlgorithmEnvironmentServiceImpl() throws ClefException, IOException {
 		this.algorithms = new HashMap<String, AlgorithmEnvironment>();
 		
-		List<Path> algorithmPaths = this.getDefinedAlgorithms();
+		String algorithmsPath = System.getenv( ENV_ALGORITHMS_DIR );
 		
-		if ( algorithmPaths.isEmpty() ) {
+		List<AlgorithmEnvironment> instances = new ArrayList<AlgorithmEnvironment>();
+		if ( algorithmsPath != null && ! algorithmsPath.equals( "" ) ) {
+			instances = FileHandler.traversePath( algorithmsPath, AlgorithmEnvironment.getPredicate(), AlgorithmEnvironment.getCreatorFunction() );
+		}
+				
+		
+		if ( instances.isEmpty() ) {
 			throw new ClefException( "AlgorithmEnvironmentService: No clefinfo.json files found within the algorithms directory tree." );
 		}
 		
-		for ( Path path : algorithmPaths ) {
-			System.out.println( "AESImpl: Constructing AlgorithmEnvironment from file: " + path.toString() );
-			AlgorithmEnvironment ae = AlgorithmEnvironment.fromFile( path );
+		for ( AlgorithmEnvironment ae : instances ) {
 			if ( ae instanceof AlgorithmEnvironment ) {
 				System.out.println( "AESImpl: Putting with name: " + ae.getAlgorithmAttributes().getName() );
 				this.algorithms.put( ae.getAlgorithmAttributes().getName(), ae );
@@ -68,40 +67,7 @@ public class AlgorithmEnvironmentServiceImpl implements AlgorithmEnvironmentServ
 		return ae;
 	}
 	
-	
-	/**
-	 * Gets a list of algorithms defined for use by Clef.
-	 * 
-	 * @return a list of absolute paths to clefinfo.json files defining algorithm environments.
-	 */
-	public List<Path> getDefinedAlgorithms() throws ClefException {
-		
-		String algorithmsPath = System.getenv( ENV_ALGORITHMS_DIR );
-		if ( algorithmsPath == null ) {
-			throw new ClefException( "Environment variable " + ENV_ALGORITHMS_DIR + " is not defined or could not be retrieved." );
-		}
-		System.out.println( "Looking in " + algorithmsPath + " for clefinfo files." );
-		Path p = FileSystems.getDefault().getPath( algorithmsPath );
-		
-		List<Path> clefinfoPaths = new ArrayList<Path>();
-		
-		try {
-			Files.walkFileTree( p, new SimpleFileVisitor<Path>() {
-				@Override
-				public FileVisitResult visitFile( Path file, BasicFileAttributes attrs ) throws IOException {
-					String absoluteFilename = file.toAbsolutePath().toString();
-					if ( absoluteFilename.endsWith( "clefinfo.json" ) ) {
-						clefinfoPaths.add( file.toAbsolutePath() );
-					}
-					return FileVisitResult.CONTINUE;
-				}
-			});
-		} catch ( IOException ioe ) {
-			ioe.printStackTrace();
-		}
-		
-		return clefinfoPaths;
-	}
+
 	
 	
 	/**
@@ -146,14 +112,5 @@ public class AlgorithmEnvironmentServiceImpl implements AlgorithmEnvironmentServ
 		}
 		return ae;
 	}
-	
-	private void printMap() {
-		if ( this.algorithms.isEmpty() ) {
-			System.out.println( "Algorithms map is empty!" );
-		} else {
-			for ( Map.Entry<String, AlgorithmEnvironment> entry : this.algorithms.entrySet() ) {
-				System.out.println( "Entry:   Name: " + entry.getKey() + " Value: " + entry.getValue() );
-			}
-		}
-	}
+
 }
