@@ -73,7 +73,7 @@ public class ContainerProxyServiceImpl implements ContainerProxyService {
 	 * 
 	 * There is currently no specification for Clef algorithm containers to accept GET requests,
 	 * or for this service to process responses to such requests. This method creates 
-	 * an HTTP POST request with Content-Type: application/xml.
+	 * an HTTP GET request with Content-Type: application/xml.
 	 * 
 	 * @since 1.0.0
 	 * @param ae the algorithm container to which a request should be proxied.
@@ -103,9 +103,9 @@ public class ContainerProxyServiceImpl implements ContainerProxyService {
 			}
 		}
 		
-		// This will be a POST request.
+		// This will be a GET request.
 		try {
-			conn.setRequestMethod( "POST" );
+			conn.setRequestMethod( "GET" );
 		} catch ( ProtocolException pe ) {
 			pe.printStackTrace();
 		}
