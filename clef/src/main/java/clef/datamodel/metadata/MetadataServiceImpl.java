@@ -11,7 +11,6 @@ import clef.datamodel.db.*;
 import clef.mir.AlgorithmEnvironmentResponse;
 import clef.mir.dataset.Dataset;
 
-import java.nio.file.Path;
 import java.util.List;
 
 public class MetadataServiceImpl {
@@ -52,7 +51,7 @@ public class MetadataServiceImpl {
 		return db.insert( ins );
 	}
 	
-	public void populateMetadata( Dataset dset, List<Path> dsetFiles ) {
+	public void populateMetadata( Dataset dset, List<Metadata> dsetFiles ) {
 		// Iterate through files
 		// Parse metadata
 		// Store in database
