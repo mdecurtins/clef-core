@@ -1,9 +1,14 @@
 package clef.mir.dataset;
 
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.ArrayList;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import clef.utility.CheckedFunction;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,8 +21,18 @@ public class Dataset {
 	private String collection;
 	private List<String> tags;
 	
+	@JsonIgnore
+	private String parentDirectory;
+	
+	@JsonIgnore
+	private static final Predicate<Path> isClefdatasetFile = path -> path.toAbsolutePath().toString().endsWith( "clefdataset.json" );
+	
+	@JsonIgnore
+	private static final CheckedFunction<Path, Dataset> createDataset = path -> Dataset.fromFile( path );
+	
 	public Dataset() {
 		this.collection = "";
+		this.parentDirectory = "";
 		this.tags = new ArrayList<String>();
 	}
 	
@@ -40,6 +55,21 @@ public class Dataset {
 		return da;
 	}
 	
+	@JsonProperty
+	public static CheckedFunction<Path, Dataset> getCreatorFunction() {
+		return createDataset;
+	}
+	
+	@JsonProperty
+	public String getParentDirectory() {
+		return parentDirectory;
+	}
+	
+	@JsonProperty
+	public static Predicate<Path> getPredicate() {
+		return isClefdatasetFile;
+	}
+	
 	public List<String> getTags() {
 		return tags;
 	}
@@ -50,6 +80,11 @@ public class Dataset {
 	
 	public void setCollection( String coll ) {
 		this.collection = coll;
+	}
+	
+	@JsonIgnore
+	public void setParentDirectory( String dir ) {
+		this.parentDirectory = dir;
 	}
 	
 	public void setTags( List<String> t ) {
