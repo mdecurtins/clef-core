@@ -103,9 +103,9 @@ public class ContainerProxyServiceImpl implements ContainerProxyService {
 			}
 		}
 		
-		// This will be a GET request.
+		// This will be a POST request.
 		try {
-			conn.setRequestMethod( "GET" );
+			conn.setRequestMethod( "POST" );
 		} catch ( ProtocolException pe ) {
 			pe.printStackTrace();
 		}

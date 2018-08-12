@@ -33,7 +33,7 @@ public class Application {
 		return "Welcome to the " + SERVICE_NAME;
 	}
 	
-	@RequestMapping(value = "/search", method = RequestMethod.GET, consumes = MediaType.APPLICATION_XML_VALUE )
+	@RequestMapping(value = "/search", method = RequestMethod.POST, consumes = MediaType.APPLICATION_XML_VALUE )
 	public ClefResponse doSearch( @RequestParam Map<String, String> params, @RequestBody String musicxml ) {
 		
 		// Prepare the response and the container for the response items.
