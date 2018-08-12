@@ -39,7 +39,11 @@ public class Dataset {
 	public static Dataset fromFile( Path path ) throws IOException {
 		Dataset dset = null;
 		ObjectMapper mapper = new ObjectMapper();
-		dset = mapper.readValue( Files.newInputStream( path ), Dataset.class );		
+		dset = mapper.readValue( Files.newInputStream( path ), Dataset.class );
+		if ( dset instanceof Dataset ) {
+			Path parent = path.getParent();
+			dset.setParentDirectory( parent.toString() );
+		}
 		return dset;
 	}
 	
