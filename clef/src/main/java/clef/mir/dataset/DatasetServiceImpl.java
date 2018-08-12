@@ -5,16 +5,16 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 
 import clef.common.ClefException;
 import clef.utility.FileHandler;
 
+/**
+ * Class that provides access to datasets.
+ * 
+ * @author Max DeCurtins
+ * @since 1.0.0
+ */
 public class DatasetServiceImpl implements DatasetService {
 
 	private Map<String, Dataset> datasets;
@@ -55,7 +55,7 @@ public class DatasetServiceImpl implements DatasetService {
 		return dsets;
 	}
 	
-	
+
 	public Dataset getDataset( String name ) throws ClefException {
 		Dataset dset = this.datasets.get( name );
 		if ( dset == null ) {
@@ -63,7 +63,6 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 		return dset;
 	}
-	
 	
 	
 	public static DatasetService getInstance() throws ClefException, IOException {
