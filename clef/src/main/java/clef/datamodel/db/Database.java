@@ -50,7 +50,12 @@ public class Database {
 			}
 			
 		} catch ( SQLException sqle ) {
-			sqle.printStackTrace();
+			// Error code 1169 arises from attempting to insert a value into a column marked UNIQUE.
+			if ( sqle.getErrorCode() == 1169 ) {
+				
+			} else {
+				sqle.printStackTrace();
+			}
 		} catch ( ClefException ce ) {
 			ce.printStackTrace();
 		}
