@@ -7,6 +7,12 @@ import clef.datamodel.Work;
 
 import java.util.List;
 
+/**
+ * Class representing a single result returned from a MIR algorithm.
+ * 
+ * @author Max DeCurtins
+ * @since 1.0.0
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ClefResult extends ClefItem {
 
