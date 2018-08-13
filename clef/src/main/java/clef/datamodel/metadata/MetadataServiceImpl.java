@@ -1,18 +1,14 @@
 package clef.datamodel.metadata;
 
 import clef.api.domain.ClefResult;
-import clef.datamodel.Composer;
-import clef.datamodel.Era;
-import clef.datamodel.Single;
-import clef.datamodel.Tag;
-import clef.datamodel.TagRelation;
-import clef.datamodel.WorkType;
+import clef.datamodel.*;
 import clef.datamodel.db.*;
 import clef.datamodel.metadata.parsers.Humdrum;
 import clef.mir.AlgorithmEnvironmentResponse;
 import clef.mir.MusicFormat;
 import clef.mir.dataset.Dataset;
 import clef.utility.CheckedFunction;
+import clef.utility.ClefUtility;
 import clef.utility.FileHandler;
 
 import java.io.IOException;
@@ -20,6 +16,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class MetadataServiceImpl {
 
@@ -98,10 +95,40 @@ public class MetadataServiceImpl {
 			}
 			
 			if ( ! meta.isEmpty() ) {
-				
+				// Loop over the Metadata instances and populate with information.
+				for ( Metadata m : meta ) {
+					
+					// Update the dataset content record with the collection name and dataset name.
+					DatasetContent dc = m.getDatasetContent();
+					dc.setCollection( d.getCollection() );
+					dc.setDatasetName( d.getDatasetAttributes().getName() );
+					m.setDatasetContent( dc );
+					
+					
+				}
 			}
 		}
 		
+	}
+	
+	private void insertEras( List<Metadata> meta ) {
+		
+		// Get Metadata instances with unique values for Era
+		List<Metadata> uniqueByEra = meta.stream().filter( ClefUtility.distinctByKey( Metadata::getEra ) ).collect( Collectors.toList() );
+		
+		if ( ! uniqueByEra.isEmpty() ) {
+			List<Era> uniqueEras = new ArrayList<Era>();
+			for ( Metadata m : uniqueByEra ) {
+				uniqueEras.add( m.getEra() );
+			}
+			
+			if ( ! uniqueEras.isEmpty() ) {
+				for ( Era era : uniqueEras ) {
+					int eraID = this.insertEra( era );
+					era.setId( eraID );
+				}
+			}
+		}
 	}
 	
 	/**
