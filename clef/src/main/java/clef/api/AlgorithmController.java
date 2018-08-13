@@ -17,10 +17,23 @@ import clef.mir.AlgorithmAttributes;
 import clef.mir.AlgorithmEnvironmentService;
 import clef.mir.AlgorithmEnvironmentServiceImpl;
 
+/**
+ * REST Controller to handle requests for information about algorithms.
+ * 
+ * @author Max DeCurtins
+ * @since 1.0.0
+ */
 @RestController
 public class AlgorithmController {
 
 	
+	/**
+	 * Lists the attributes of all discovered MIR algorithms.
+	 * 
+	 * @return a ClefResponse of type ALGORITHM_PROFILE
+	 * @see ResponseType
+	 * @since 1.0.0
+	 */
 	@RequestMapping( value = "/algorithms", method = RequestMethod.GET )
 	public ClefResponse listAll() {
 		AlgorithmEnvironmentService aes = null;

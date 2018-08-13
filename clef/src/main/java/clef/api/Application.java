@@ -21,6 +21,12 @@ import clef.api.domain.response.ResponseType;
 import clef.common.ClefException;
 import clef.common.ClefService;
 
+/**
+ * REST Controller that handles requests for MIR searches.
+ * 
+ * @author Max DeCurtins
+ * @since 1.0.0
+ */
 @SpringBootApplication
 @RestController
 public class Application {
@@ -28,11 +34,29 @@ public class Application {
 	public static final double VERSION = 0.1;
 	public static final String SERVICE_NAME = "Clef REST API v" + VERSION;
 	
+	
+	/**
+	 * Identifies this REST service.
+	 * 
+	 * @return the name and version of this REST service.
+	 * @since 1.0.0
+	 */
 	@RequestMapping("/")
 	public String root() {
 		return "Welcome to the " + SERVICE_NAME;
 	}
 	
+	
+	/**
+	 * Executes a MIR search using the selected algorithm(s) and dataset(s).
+	 * 
+	 * @param params key-value pairs derived from the URL parameter string
+	 * @param musicxml a MusicXML query document
+	 * @return
+	 * @see ResponseType
+	 * @see ClefService#doSearch(Map, String)
+	 * @since 1.0.0
+	 */
 	@RequestMapping(value = "/search", method = RequestMethod.POST, consumes = MediaType.APPLICATION_XML_VALUE )
 	public ClefResponse doSearch( @RequestParam Map<String, String> params, @RequestBody String musicxml ) {
 		

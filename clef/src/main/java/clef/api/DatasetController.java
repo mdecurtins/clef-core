@@ -15,9 +15,23 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 
+/**
+ * REST Controller to handle requests for information about symbolic music datasets.
+ * 
+ * @author Max DeCurtins
+ * @since 1.0.0
+ */
 @RestController
 public class DatasetController {
 
+	
+	/**
+	 * Lists the attributes of all discovered symbolic music datasets.
+	 * 
+	 * @return a ClefResponse of type DATASET_PROFILE
+	 * @see ResponseType
+	 * @since 1.0.0
+	 */
 	@RequestMapping( value = "/datasets", method = RequestMethod.GET )
 	public ClefResponse listAll() {
 		
