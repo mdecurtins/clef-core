@@ -5,6 +5,12 @@ import java.util.ArrayList;
 
 import clef.mir.AlgorithmAttributes;
 
+/**
+ * Class representing an API response containing information about MIR algorithms.
+ * 
+ * @author Max DeCurtins
+ * @since 1.0.0
+ */
 public class AlgorithmProfileResponse extends ClefResponse {
 
 	private List<AlgorithmAttributes> algorithms;

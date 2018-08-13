@@ -2,6 +2,12 @@ package clef.api.domain.response;
 
 import java.util.List;
 
+/**
+ * Class to make API response objects.
+ * 
+ * @author Max DeCurtins
+ * @since 1.0.0
+ */
 public class ClefResponseFactory {
 
 	private static ClefResponse getConcreteResponse( ResponseType rt ) {
@@ -28,10 +34,28 @@ public class ClefResponseFactory {
 		return response;
 	}
 	
+	/**
+	 * Make a response object without any data.
+	 * 
+	 * @param rt
+	 * @return
+	 * @see ResponseType
+	 * @since 1.0.0
+	 */
 	public static ClefResponse make( ResponseType rt ) {
 		return getConcreteResponse( rt );
 	}
 	
+	
+	/**
+	 * Make a response object with data.
+	 * 
+	 * @param rt
+	 * @param data
+	 * @return
+	 * @see ResponseType
+	 * @since 1.0.0
+	 */
 	public static <T> ClefResponse make( ResponseType rt, List<T> data ) {
 		ClefResponse response = getConcreteResponse( rt );
 		if ( rt != ResponseType.EMPTY ) {

@@ -1,5 +1,11 @@
 package clef.api.domain.response;
 
+/**
+ * Enum representing the type of an API response.
+ * 
+ * @author Max DeCurtins
+ * @since 1.0.0
+ */
 public enum ResponseType {
 	ALGORITHM_PROFILE ( "algorithm_profile" ),
 	DATASET_PROFILE ( "dataset_profile" ),

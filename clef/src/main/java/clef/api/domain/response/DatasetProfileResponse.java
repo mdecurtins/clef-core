@@ -5,6 +5,12 @@ import java.util.ArrayList;
 
 import clef.mir.dataset.Dataset;
 
+/**
+ * Class representing an API response containing information about symbolic music datasets.
+ * 
+ * @author Max DeCurtins
+ * @since 1.0.0
+ */
 public class DatasetProfileResponse extends ClefResponse {
 
 	private List<Dataset> datasets;

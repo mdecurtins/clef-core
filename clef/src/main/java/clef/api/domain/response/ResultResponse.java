@@ -5,6 +5,12 @@ import java.util.ArrayList;
 
 import clef.api.domain.ClefResult;
 
+/**
+ * Class representing an API response containing results from a MIR search.
+ * 
+ * @author Max DeCurtins
+ * @since 1.0.0
+ */
 public class ResultResponse extends ClefResponse {
 
 	private List<ClefResult> results;

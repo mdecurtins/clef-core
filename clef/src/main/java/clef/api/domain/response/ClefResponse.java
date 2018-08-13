@@ -8,6 +8,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import clef.api.Application;
 
+/**
+ * Superclass of all API response classes.
+ * 
+ * @author Max DeCurtins
+ * @since 1.0.0
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class ClefResponse {
 
@@ -27,6 +33,11 @@ public abstract class ClefResponse {
 		this.timestamp = now.getEpochSecond();
 	}
 	
+	/**
+	 * 
+	 * @param l the data that should be returned to the client in this response
+	 * @since 1.0.0
+	 */
 	public abstract <T> void setData( List<T> l );
 
 	public double getApiVersion() {
