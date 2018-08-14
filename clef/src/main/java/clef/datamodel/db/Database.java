@@ -13,7 +13,7 @@ import clef.common.ClefException;
 
 public class Database {
 
-	private Connection getConnection() {
+	protected Connection getConnection() {
 		Connection conn = null;
 		String p = System.getenv( "MYSQL_ROOT_PASSWORD" );
 		String db = System.getenv( "MYSQL_DATABASE" );
@@ -44,18 +44,14 @@ public class Database {
 				
 				if ( rs.next() ) {
 					insertedId = rs.getInt( 1 );
+					rs.close();
 				} else {
 					throw new SQLException( "Error: could not retrieve last inserted ID." );
 				}
 			}
 			
 		} catch ( SQLException sqle ) {
-			// Error code 1169 arises from attempting to insert a value into a column marked UNIQUE.
-			if ( sqle.getErrorCode() == 1169 ) {
-				
-			} else {
-				sqle.printStackTrace();
-			}
+			sqle.printStackTrace();
 		} catch ( ClefException ce ) {
 			ce.printStackTrace();
 		}
