@@ -23,7 +23,7 @@ public class WorkDAO extends ClefDAO {
 	
 	public int batchInsert( List<Work> works ) {
 		int retval = 0;
-		String sql = "INSERT INTO works VALUES ( ?, ?, ?, ?, ?, ? ) ON DUPLICATE KEY UPDATE id = id;";
+		String sql = "INSERT INTO works ( title, catalog, catalog_number, composer_id, era_id, work_type_id ) VALUES ( ?, ?, ?, ?, ?, ? ) ON DUPLICATE KEY UPDATE id = id;";
 		Database db = new Database();
 		try {
 			Connection conn = db.getConnection();
