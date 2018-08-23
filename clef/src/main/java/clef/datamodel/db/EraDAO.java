@@ -7,6 +7,10 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 
 import clef.datamodel.Era;
@@ -19,6 +23,8 @@ import clef.datamodel.metadata.Metadata;
  */
 public class EraDAO extends ClefDAO {
 	
+	private static final Logger logger = LoggerFactory.getLogger( EraDAO.class );
+	
 	private static BiPredicate<Era, Metadata> matchEra = ( era, m ) -> era.getValue().equals( m.getEra().getValue() );
 	private static BiConsumer<Era, Metadata> updateEra = ( era, m ) -> m.setEra( era );
 	
@@ -30,8 +36,9 @@ public class EraDAO extends ClefDAO {
 	 * @since 1.0.0
 	 */
 	public int batchInsert( List<Era> eras ) {
+		logger.info( "EraDAO: calling batchInsert()...");
 		int retval = 0;
-		String sql = "INSERT INTO eras VALUES ( ? ) ON DUPLICATE KEY UPDATE id = id;";
+		String sql = "INSERT INTO eras ( era ) VALUES ( ? ) ON DUPLICATE KEY UPDATE id = id;";
 		Database db = new Database();
 		try {
 			Connection conn = db.getConnection();
@@ -44,7 +51,7 @@ public class EraDAO extends ClefDAO {
 			retval = this.sumBatchInsert( results );
 			conn.commit();
 		} catch ( SQLException sqle ) {
-			
+			logger.error( sqle.getMessage() );
 		}
 		return retval;
 	}
@@ -112,7 +119,7 @@ public class EraDAO extends ClefDAO {
 			}			
 			rs.close();
 		} catch ( SQLException sqle ) {
-			
+			logger.error( sqle.getMessage() );
 		}
 		return eras;
 	}
