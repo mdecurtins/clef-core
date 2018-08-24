@@ -7,31 +7,57 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import clef.common.ClefException;
 
+/**
+ * Class that provides database connectivity for the Clef metadata store.
+ * 
+ * @author Max DeCurtins
+ * @since 1.0.0
+ */
 public class Database {
 
+	private static final Logger logger = LoggerFactory.getLogger( Database.class );
+	
+	/**
+	 * 
+	 * @return
+	 * @since 1.0.0
+	 */
 	protected Connection getConnection() {
 		Connection conn = null;
 		String p = System.getenv( "MYSQL_ROOT_PASSWORD" );
 		String db = System.getenv( "MYSQL_DATABASE" );
 		
 		if ( p == null || db == null || p.equals("") || db.equals("") ) {
-			System.err.println( "Error: could not get database credentials from the environment." );
+			logger.error( "Error: could not get database credentials from the environment." );
 			return conn;
 		}
 		try {
-			String url = String.format( "jdbc:mysql://db:3306/%s?user=root&password=%s", db, p );
+			// Suppress MySQL SSL warning - consider SSL in future development
+			String url = String.format( "jdbc:mysql://db:3306/%s?user=root&password=%s&useSSL=false", db, p );
 			
 			conn = DriverManager.getConnection( url );
 		} catch ( SQLException sqle ) {
 			sqle.printStackTrace();
 		}
+		if ( conn == null ) {
+			logger.error( "getConnection(): connection was null");
+		}
 		return conn;
 	}
 	
+	
+	/**
+	 * Method to insert a single record in the database.
+	 * 
+	 * @param clefStatement
+	 * @return
+	 * @since 1.0.0
+	 */
 	public <T extends Insert> int insert( T clefStatement ) {
 		
 		int insertedId = -1;
@@ -59,6 +85,14 @@ public class Database {
 		return insertedId;
 	}
 	
+	
+	/**
+	 * Method to select from the database.
+	 * 
+	 * @param sql
+	 * @return
+	 * @since 1.0.0
+	 */
 	public ResultSet select( String sql ) {
 		ResultSet rs = null;
 		Connection conn = this.getConnection();
@@ -75,8 +109,5 @@ public class Database {
 		return rs;
 	}
 	
-	public ResultSet selectPrepared( String sql, Map<String, Object> params ) {
-		
-		return null;
-	}
+	
 }
