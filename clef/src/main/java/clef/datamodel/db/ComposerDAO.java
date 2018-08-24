@@ -9,18 +9,28 @@ import java.util.ArrayList;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import clef.datamodel.Composer;
 import clef.datamodel.metadata.Metadata;
 
 public class ComposerDAO extends ClefDAO {
 
+	private static final Logger logger = LoggerFactory.getLogger( ComposerDAO.class );
+	
 	private static BiPredicate<Composer, Metadata> matchComposer = ( composer, m ) -> composer.getName().equals( m.getComposer().getName() );
 	private static BiConsumer<Composer, Metadata> updateComposer = ( composer, m ) -> m.setComposer( composer );
 	
+	
+	/**
+	 * 
+	 * @param composers
+	 * @return
+	 */
 	public int batchInsert( List<Composer> composers ) {
 		int retval = 0;
-		String sql = "INSERT INTO composers VALUES ( ?, ?, ? ) ON DUPLICATE KEY UPDATE id = id;";
+		String sql = "INSERT INTO composers ( composer_name, born, died ) VALUES ( ?, ?, ? ) ON DUPLICATE KEY UPDATE id = id;";
 		Database db = new Database();
 		try {
 			Connection conn = db.getConnection();
@@ -35,27 +45,48 @@ public class ComposerDAO extends ClefDAO {
 			retval = this.sumBatchInsert( results );
 			conn.commit();
 		} catch ( SQLException sqle ) {
-			
+			logger.error( sqle.getMessage() );
 		}
 		return retval;
 	}
 	
+	
+	/**
+	 * 
+	 * @return
+	 */
 	public static BiPredicate<Composer, Metadata> getMatchingPredicate() {
 		return matchComposer;	
 	}
 	
+	
+	/**
+	 * 
+	 * @return
+	 */
 	public static BiConsumer<Composer, Metadata> getUpdateConsumerFunction() {
 		return updateComposer;
 	}
 	
+	
+	/**
+	 * 
+	 * @param meta
+	 * @return
+	 */
 	public List<Composer> mapFromMetadata( List<Metadata> meta ) {
 		List<Composer> composers = new ArrayList<Composer>();
 		for ( Metadata m : meta ) {
+			logger.debug( "mapFromMetadata::getComposer - name = " + m.getComposer().getName() + ", born = " + m.getComposer().born() + ", died = " + m.getComposer().died() );
 			composers.add( m.getComposer() );
 		}
 		return composers;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public List<Composer> selectAll() {
 		List<Composer> allComposers = new ArrayList<Composer>();
 		String sql = "SELECT * FROM composers;";
@@ -63,15 +94,21 @@ public class ComposerDAO extends ClefDAO {
 		ResultSet rs = db.select( sql );
 		try {
 			while ( rs.next() ) {
-				
+				allComposers.add( new Composer( rs.getInt( "id" ), rs.getString( "composer_name" ), rs.getInt( "born" ), rs.getInt( "died" ) ) );
 			}
 			rs.close();
 		} catch ( SQLException sqle ) {
-			
+			logger.error( sqle.getMessage() );
 		}
 		return allComposers;
 	}
 	
+	
+	/**
+	 * 
+	 * @param meta
+	 * @param composers
+	 */
 	public void updateMetadata( List<Metadata> meta, List<Composer> composers ) {
 		for ( Composer c : composers ) {
 			for ( Metadata m : meta ) {
