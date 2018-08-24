@@ -1,6 +1,7 @@
 package clef.datamodel.metadata;
 
-import java.util.function.BiPredicate;
+
+import java.util.List;
 
 import clef.datamodel.*;
 
@@ -16,20 +17,10 @@ public class Metadata {
 	private Composer c;
 	private DatasetContent dc;
 	private Era era;
+	private List<Tag> tags;
 	private Work w;
 	private WorkType wt;
-	
-	// Predicates
-	private static BiPredicate<Composer, Metadata> matchComposer = ( composer, m ) -> composer.getName().equals( m.getComposer().getName() );
-	private static BiPredicate<Era, Metadata> matchEra = ( era, m ) -> era.getValue().equals( m.getEra().getValue() ); 
-	private static BiPredicate<Work, Metadata> matchWork = ( w, m ) -> w.getTitle().equals( m.getWork().getTitle() ) &&
-																	   w.getCatalog().equals( m.getWork().getCatalog() ) && 
-																	   w.getCatalogNumber().equals( m.getWork().getCatalogNumber() );
-	private static BiPredicate<WorkType, Metadata> matchWorkType = ( wt, m ) -> wt.getValue().equals( m.getWorkType().getValue() );
-	
-	// Functions
-	
-	
+
 	public Composer getComposer() {
 		return c;
 	}
@@ -40,6 +31,10 @@ public class Metadata {
 	
 	public Era getEra() {
 		return era;
+	}
+	
+	public List<Tag> getTags() {
+		return tags;
 	}
 	
 	public Work getWork() {
@@ -60,6 +55,10 @@ public class Metadata {
 	
 	public void setEra( Era era ) {
 		this.era = era;
+	}
+	
+	public void setTags( List<Tag> tags ) {
+		this.tags = tags;
 	}
 	
 	public void setWork( Work w ) {
