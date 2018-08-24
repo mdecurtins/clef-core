@@ -18,19 +18,14 @@ import clef.utility.FileHandler;
 public class DatasetServiceImpl implements DatasetService {
 
 	private Map<String, Dataset> datasets;
-	private static final String ENV_DATASETS_DIR = "DATASETS_DIR";
-	private static DatasetService instance;
 	
+	private static DatasetService instance;
+
 	
 	private DatasetServiceImpl() throws ClefException, IOException {
 		this.datasets = new HashMap<String, Dataset>();
 		
-		String datasetsPath = System.getenv( ENV_DATASETS_DIR );
-		
-		List<Dataset> dsets = new ArrayList<Dataset>();
-		if ( datasetsPath != null && ! datasetsPath.equals( "" ) ) {
-			dsets = FileHandler.traversePath( datasetsPath, Dataset.getPredicate(), Dataset.getCreatorFunction() );
-		}
+		List<Dataset> dsets = Dataset.discoverDatasets();
 		
 		if ( dsets.isEmpty() ) {
 			throw new ClefException( "DatasetService: no clefdataset.json files within the datasets directory tree." );
@@ -43,6 +38,7 @@ public class DatasetServiceImpl implements DatasetService {
 				System.err.println( "Dataset.fromFile() did not produce an instance of Dataset." );
 			}
 		}
+
 		
 	}
 	
