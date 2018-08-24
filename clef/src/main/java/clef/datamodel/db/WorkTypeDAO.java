@@ -15,6 +15,12 @@ import org.slf4j.LoggerFactory;
 import clef.datamodel.WorkType;
 import clef.datamodel.metadata.Metadata;
 
+/**
+ * Data access class for WorkType objects.
+ * 
+ * @author Max DeCurtins
+ * @since 1.0.0
+ */
 public class WorkTypeDAO extends ClefDAO {
 	
 	private static final Logger logger = LoggerFactory.getLogger( WorkTypeDAO.class );
@@ -22,6 +28,12 @@ public class WorkTypeDAO extends ClefDAO {
 	private static BiPredicate<WorkType, Metadata> matchWorkType = ( wt, m ) -> wt.getValue().equals( m.getWorkType().getValue() );
 	private static BiConsumer<WorkType, Metadata> updateWorkType = ( wt, m ) -> m.setWorkType( wt );
 
+	/**
+	 * 
+	 * @param wtypes
+	 * @return
+	 * @since 1.0.0
+	 */
 	public int batchInsert( List<WorkType> wtypes ) {
 		int retval = 0;
 		String sql = "INSERT INTO work_type ( work_type ) VALUES ( ? ) ON DUPLICATE KEY UPDATE id = id;";
@@ -42,18 +54,44 @@ public class WorkTypeDAO extends ClefDAO {
 		return retval;
 	}
 	
+	
+	/**
+	 * 
+	 * @return
+	 * @since 1.0.0
+	 */
 	public static BiPredicate<WorkType, Metadata> getMatchingPredicate() {
 		return matchWorkType;
 	}
 	
+	
+	/**
+	 * 
+	 * @return
+	 * @since 1.0.0
+	 */
 	public static BiConsumer<WorkType, Metadata> getUpdateConsumerFunction() {
 		return updateWorkType;
 	}
 	
+	
+	/**
+	 * 
+	 * @param wt
+	 * @return
+	 * @since 1.0.0
+	 */
 	public int insertWorkType( WorkType wt ) {
 		return this.insertSingle( wt );
 	}
 	
+	
+	/**
+	 * 
+	 * @param meta
+	 * @return
+	 * @since 1.0.0
+	 */
 	public List<WorkType> mapFromMetadata( List<Metadata> meta ) {
 		List<WorkType> wtypes = new ArrayList<WorkType>();
 		for ( Metadata m : meta ) {
@@ -62,6 +100,12 @@ public class WorkTypeDAO extends ClefDAO {
 		return wtypes;
 	}
 	
+	
+	/**
+	 * 
+	 * @return
+	 * @since 1.0.0
+	 */
 	public List<WorkType> selectAll() {
 		List<WorkType> wtypes = new ArrayList<WorkType>();
 		String sql = "SELECT * FROM work_type;";
@@ -78,6 +122,13 @@ public class WorkTypeDAO extends ClefDAO {
 		return wtypes;
 	}
 	
+	
+	/**
+	 * 
+	 * @param meta
+	 * @param wtypes
+	 * @since 1.0.0
+	 */
 	public void updateMetadata( List<Metadata> meta, List<WorkType> wtypes ) {
 		for ( WorkType wt : wtypes ) {
 			for ( Metadata m : meta ) {
