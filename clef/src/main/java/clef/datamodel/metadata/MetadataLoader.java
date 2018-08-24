@@ -60,6 +60,7 @@ public class MetadataLoader implements CommandLineRunner {
 		this.insertEras( meta );
 		this.insertWorkTypes( meta );
 		this.insertComposers( meta );
+		this.insertTags( meta );
 		// 2. Populate tables with foreign keys dependent on composers, eras, tags, and work_types
 		
 		//this.insertWorks( meta );
@@ -191,7 +192,19 @@ public class MetadataLoader implements CommandLineRunner {
 	private void insertTags( List<Metadata> meta ) {
 		logger.info( "Calling insertTags()...");
 		
+		TagDAO tdao = new TagDAO();
+		List<Tag> tags = tdao.mapFromMetadata( meta );
 		
+		int inserted = tdao.batchInsert( tags );
+		logger.debug( "Count of inserted tags = " + inserted );
+		
+		List<Tag> allTags = tdao.selectAll();
+		tdao.updateMetadata( meta, allTags );
+	}
+	
+	
+	private void insertTagRelations( List<Metadata> meta ) {
+		logger.info( "Calling insertTagRelations()...");
 	}
 	
 	
@@ -259,7 +272,7 @@ public class MetadataLoader implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		/*
+		
 		logger.info( "Invoking MetadataLoader...");
 
 		List<Dataset> dsets = new ArrayList<Dataset>();
@@ -272,6 +285,6 @@ public class MetadataLoader implements CommandLineRunner {
 		} catch ( IOException ioe ) {
 			ioe.printStackTrace();
 		}
-		*/
+		
 	}
 }
