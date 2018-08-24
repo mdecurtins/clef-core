@@ -27,13 +27,18 @@ import clef.common.ClefService;
  * @author Max DeCurtins
  * @since 1.0.0
  */
-@SpringBootApplication
+@SpringBootApplication( scanBasePackages = { "clef.api", "clef.api.domain", "clef.api.domain.response", "clef.api.utility", "clef.common", "clef.datamodel", 
+		"clef.datamodel.db", "clef.datamodel.metadata", "clef.datamodel", "clef.datamodel.metadata.parsers", "clef.mir", "clef.mir.clefinfo", 
+		"clef.mir.dataset", "clef.mir.xml", "clef.utility" } )
 @RestController
 public class Application {
 
 	public static final double VERSION = 0.1;
 	public static final String SERVICE_NAME = "Clef REST API v" + VERSION;
 	
+	public static void main(String[] args) {
+		SpringApplication.run( Application.class, args );
+	}
 	
 	/**
 	 * Identifies this REST service.
@@ -84,8 +89,7 @@ public class Application {
 		return response;
 	}
 	
-	public static void main(String[] args) {
-		SpringApplication.run( Application.class, args );
-	}
+
+
 
 }
