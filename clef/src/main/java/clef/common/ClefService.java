@@ -11,10 +11,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.springframework.stereotype.Component;
+
 import clef.api.domain.*;
 import clef.api.domain.response.*;
 import clef.api.utility.QueryHelper;
-import clef.datamodel.*;
+import clef.datamodel.metadata.MetadataService;
+import clef.datamodel.metadata.MetadataServiceImpl;
+import clef.datamodel.metadata.MetadataLoader;
 import clef.mir.*;
 import clef.mir.dataset.Dataset;
 import clef.mir.dataset.DatasetService;
@@ -25,11 +29,13 @@ import clef.mir.dataset.DatasetServiceImpl;
  * @author Max DeCurtins
  * @since 1.0.0
  */
+@Component
 public class ClefService {
 
 	private AlgorithmEnvironmentService aes;
 	private ContainerProxyService cps;
 	private DatasetService ds;
+	private MetadataService ms;
 	
 	/**
 	 * 
@@ -49,6 +55,11 @@ public class ClefService {
 		this.ds = DatasetServiceImpl.getInstance();
 		if ( ! (this.ds instanceof DatasetService) ) {
 			throw new ClefException( "Fatal: could not obtain an instance of DatasetService." );
+		}
+		
+		this.ms = new MetadataServiceImpl();
+		if ( ! (this.ms instanceof MetadataService) ) {
+			throw new ClefException( "Fatal: could not obtain an instance of MetadataService." );
 		}
 	}
 	
@@ -181,22 +192,17 @@ public class ClefService {
 	}
 	
 	
+	/**
+	 * 
+	 * @param aer
+	 * @return
+	 * @since 1.0.0
+	 */
 	private List<ClefItem> mapAlgorithmResponse( AlgorithmEnvironmentResponse aer ) {
 		List<ClefItem> items = new ArrayList<ClefItem>();
 		if ( aer.getStatus().equals( "success" ) ) {
-			for ( Result r : aer.getResults() ) {
-				// Initialize the components.
-				ClefResult cr = new ClefResult();
-				Work w = new Work();
-				w.setTitle( r.getFilename() );
-				Composer c = new Composer( "Johann Sebastian Bach", "1685", "1750" );
-				
-				cr.setRanking( r.getID() );
-				cr.setComposer( c );
-				cr.setWork(w);
-				
-				items.add( cr );
-			}
+			List<ClefResult> results = this.ms.mapMetadata( aer );
+			items.addAll( results );
 		} else if ( aer.getStatus().equals( "error" ) ) {
 			if ( ! aer.getErrors().isEmpty() ) {
 				for ( String err : aer.getErrors() ) {
@@ -222,4 +228,5 @@ public class ClefService {
 		Set<String> required = new HashSet<String>( Arrays.asList( "algorithms", "datasets" ) );
 		return QueryHelper.checkRequiredParameters( requestParams, required );
 	}
+
 }
