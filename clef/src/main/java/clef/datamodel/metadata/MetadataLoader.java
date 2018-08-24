@@ -56,17 +56,17 @@ public class MetadataLoader implements CommandLineRunner {
 	 */
 	private void doInserts( List<Metadata> meta ) {
 		logger.info( "Calling doInserts()..." );
+		
 		// 1. Populate tables with no foreign keys: composers, eras, tags, work_types
 		this.insertEras( meta );
 		this.insertWorkTypes( meta );
 		this.insertComposers( meta );
 		this.insertTags( meta );
-		// 2. Populate tables with foreign keys dependent on composers, eras, tags, and work_types
 		
-		//this.insertWorks( meta );
+		// 2. Populate tables with foreign keys dependent on composers, eras, tags, and work_types: works
+		this.insertWorks( meta );
 		
-		// 2b. Insert tag relations
-		// 3. Populate tables with foreign keys dependent on works
+		// 3. Populate tables with foreign keys dependent on works: dataset_contents and tag_relations
 	}
 	
 	
@@ -242,10 +242,12 @@ public class MetadataLoader implements CommandLineRunner {
 	 * @param meta
 	 */
 	private void insertWorks( List<Metadata> meta ) {
+		logger.debug( "Calling insertWorks()...");
 		WorkDAO wd = new WorkDAO();
 		List<Work> works = wd.mapFromMetadata( meta );
 		
 		int inserted = wd.batchInsert( works );
+		logger.debug( "insertWorks(): num inserted = " + inserted );
 		List<Work> allWorks = wd.selectAll();
 		if ( ! allWorks.isEmpty() ) {
 			wd.updateMetadata( meta, allWorks );
