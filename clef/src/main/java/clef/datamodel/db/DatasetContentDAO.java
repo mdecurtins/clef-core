@@ -14,7 +14,7 @@ public class DatasetContentDAO extends ClefDAO {
 			dc.getFilename().equals( m.getDatasetContent().getFilename() );
 	
 	public int batchInsert( List<DatasetContent> dsetCont ) {
-		String sql = "INSERT INTO dataset_contents VALUES ( ?, ?, ?, ?, ? ) ON DUPLICATE KEY UPDATE id = id;";
+		String sql = "INSERT INTO dataset_contents ( collection, dataset_name, filename, work_id ) VALUES ( ?, ?, ?, ? ) ON DUPLICATE KEY UPDATE id = id;";
 		return 0;
 	}
 	
