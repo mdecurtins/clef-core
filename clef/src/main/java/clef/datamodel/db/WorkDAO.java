@@ -9,10 +9,21 @@ import java.util.ArrayList;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import clef.datamodel.Work;
 import clef.datamodel.metadata.Metadata;
 
+/**
+ * Data access class for single musical works.
+ * 
+ * @author Max DeCurtins
+ * @since 1.0.0
+ */
 public class WorkDAO extends ClefDAO {
+	
+	private static final Logger logger = LoggerFactory.getLogger( WorkDAO.class );
 
 	private static BiPredicate<Work, Metadata> matchWork = ( w, m ) -> w.getTitle().equals( m.getWork().getTitle() ) &&
 			   w.getCatalog().equals( m.getWork().getCatalog() ) && 
@@ -21,6 +32,12 @@ public class WorkDAO extends ClefDAO {
 	private static BiConsumer<Work, Metadata> updateWork = ( w, m ) -> m.setWork( w );
 	
 	
+	/**
+	 * 
+	 * @param works
+	 * @return
+	 * @since 1.0.0
+	 */
 	public int batchInsert( List<Work> works ) {
 		int retval = 0;
 		String sql = "INSERT INTO works ( title, catalog, catalog_number, composer_id, era_id, work_type_id ) VALUES ( ?, ?, ?, ?, ?, ? ) ON DUPLICATE KEY UPDATE id = id;";
@@ -41,19 +58,38 @@ public class WorkDAO extends ClefDAO {
 			retval = this.sumBatchInsert( results );
 			conn.commit();
 		} catch ( SQLException sqle ) {
-			sqle.printStackTrace();
+			logger.error( sqle.getMessage() );
 		}
 		return retval;
 	}
 	
+	
+	/**
+	 * 
+	 * @return
+	 * @since 1.0.0
+	 */
 	public static BiPredicate<Work, Metadata> getMatchingPredicate() {
 		return matchWork;
 	}
 	
+	
+	/**
+	 * 
+	 * @return
+	 * @since 1.0.0
+	 */
 	public static BiConsumer<Work, Metadata> getUpdateConsumerFunction() {
 		return updateWork;
 	}
 	
+	
+	/**
+	 * 
+	 * @param meta
+	 * @return 
+	 * @since 1.0.0
+	 */
 	public List<Work> mapFromMetadata( List<Metadata> meta ) {
 		List<Work> works = new ArrayList<Work>();
 		for ( Metadata m : meta ) {
@@ -62,6 +98,12 @@ public class WorkDAO extends ClefDAO {
 		return works;
 	}
 	
+	
+	/**
+	 * 
+	 * @return
+	 * @since 1.0.0
+	 */
 	public List<Work> selectAll() {
 		List<Work> allWorks = new ArrayList<Work>();
 		String sql = "SELECT * FROM works;";
@@ -81,11 +123,18 @@ public class WorkDAO extends ClefDAO {
 			}
 			rs.close();
 		} catch ( SQLException sqle ) {
-			sqle.printStackTrace();
+			logger.error( sqle.getMessage() );
 		} 
 		return allWorks;
 	}
 	
+	
+	/**
+	 * 
+	 * @param meta
+	 * @param works
+	 * @since 1.0.0
+	 */
 	public void updateMetadata( List<Metadata> meta, List<Work> works ) {
 		for ( Work w : works ) {
 			for ( Metadata m : meta ) {
