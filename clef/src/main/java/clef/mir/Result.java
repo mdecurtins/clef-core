@@ -5,8 +5,13 @@ import java.util.Map;
 public class Result {
 
 	private int id;
+	private String datasetName;
 	private String filename;
 	private Map<String, Object> properties;
+	
+	public String getDatasetName() {
+		return datasetName;
+	}
 	
 	public String getFilename() {
 		return filename;
@@ -18,6 +23,10 @@ public class Result {
 	
 	public Map<String, Object> getProperties() {
 		return properties;
+	}
+	
+	public void setDatasetName( String dset ) {
+		this.datasetName = dset;
 	}
 	
 	public void setFilename( String f ) {
