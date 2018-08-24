@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import clef.utility.CheckedFunction;
+import clef.utility.FileHandler;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -25,6 +26,9 @@ public class Dataset {
 	private String parentDirectory;
 	
 	@JsonIgnore
+	private static final String ENV_DATASETS_DIR = "DATASETS_DIR";
+	
+	@JsonIgnore
 	private static final Predicate<Path> isClefdatasetFile = path -> path.toAbsolutePath().toString().endsWith( "clefdataset.json" );
 	
 	@JsonIgnore
@@ -34,6 +38,18 @@ public class Dataset {
 		this.collection = "";
 		this.parentDirectory = "";
 		this.tags = new ArrayList<String>();
+	}
+	
+	public static List<Dataset> discoverDatasets() throws IOException {
+
+		String datasetsPath = System.getenv( ENV_DATASETS_DIR );
+		
+		List<Dataset> dsets = new ArrayList<Dataset>();
+		if ( datasetsPath != null && ! datasetsPath.equals( "" ) ) {
+			dsets = FileHandler.traversePath( datasetsPath, getPredicate(), getCreatorFunction() );
+		}
+		
+		return dsets;
 	}
 	
 	public static Dataset fromFile( Path path ) throws IOException {
