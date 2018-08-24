@@ -11,6 +11,14 @@ import java.nio.file.Path;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Class to parse Humdrum metadata.
@@ -19,6 +27,8 @@ import java.util.regex.Pattern;
  * @since 1.0.0
  */
 public class Humdrum {
+	
+	private static final Logger logger = LoggerFactory.getLogger( Humdrum.class );
 	
 	private static final Predicate<Path> isHumdrumFile = path -> path.toAbsolutePath().toString().endsWith( ".krn" );
 	
@@ -31,6 +41,11 @@ public class Humdrum {
 	public static CheckedFunction<Path, Metadata> getCreatorFunction() {
 		return createMetadata;
 	}
+	
+	private static List<Tag> getTags( String metaval ) {
+		List<String> vals = Arrays.asList( metaval.split( "," ) );
+		return vals.stream().map( s -> new Tag( s ) ).collect( Collectors.toList() );
+	}
 
 	public static Metadata parse( Path p ) throws IOException {
 		
@@ -39,6 +54,7 @@ public class Humdrum {
 		Composer c = new Composer();
 		DatasetContent dc = new DatasetContent();
 		Era era = null;
+		List<Tag> tags = new ArrayList<Tag>();
 		Work w = new Work();
 		WorkType wt = null;
 		
@@ -55,6 +71,9 @@ public class Humdrum {
 				case "COM":
 					c.setName( metaval );
 					break;
+				case "CDT":
+					setComposerDates( c, metaval );
+					break;
 				case "OTL":
 					w.setTitle( trimTitle( metaval ) );
 					break;
@@ -66,6 +85,9 @@ public class Humdrum {
 					break;
 				case "AFR":
 					wt = new WorkType( metaval );
+					break;
+				case "AGN":
+					tags = getTags( metaval );
 					break;
 				}
 			}
@@ -81,9 +103,41 @@ public class Humdrum {
 		if ( wt != null ) {
 			m.setWorkType( wt );
 		}
+		m.setTags( tags );
 		
 		return m;
 	}
+	
+	
+	/**
+	 * 
+	 * @since 1.0.0
+	 * @param range
+	 */
+	private static void setComposerDates( Composer c, String range ) {
+		
+		Pattern pattern = Pattern.compile( "(\\d{4})" );
+		Matcher matcher = pattern.matcher( range );
+		
+		String born = "";
+		String died = "";
+		
+		int i = 1;
+		while ( matcher.find() ) {
+			if ( i == 1 ) {
+				born = matcher.group();
+			} else if ( i == 2 ) {
+				died = matcher.group();
+			}
+			i++;
+		}
+		if ( i == 1 ) {
+			logger.error( "Humdrum::setComposerDates - loop did not run, i is 1");
+		}
+		logger.debug( "Humdrum::setComposerDates - matches found, born: " + born + ", died: " + died );
+		c.setDates( born, died );
+	}
+	
 	
 	private static void setWorkCatalogAndCatalogName( Work w, String metaval ) {
 		String[] both = metaval.split( "\\s+" );
