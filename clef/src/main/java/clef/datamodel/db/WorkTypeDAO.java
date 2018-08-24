@@ -9,17 +9,22 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import clef.datamodel.WorkType;
 import clef.datamodel.metadata.Metadata;
 
 public class WorkTypeDAO extends ClefDAO {
+	
+	private static final Logger logger = LoggerFactory.getLogger( WorkTypeDAO.class );
 	
 	private static BiPredicate<WorkType, Metadata> matchWorkType = ( wt, m ) -> wt.getValue().equals( m.getWorkType().getValue() );
 	private static BiConsumer<WorkType, Metadata> updateWorkType = ( wt, m ) -> m.setWorkType( wt );
 
 	public int batchInsert( List<WorkType> wtypes ) {
 		int retval = 0;
-		String sql = "INSERT INTO work_type VALUES ( ? ) ON DUPLICATE KEY UPDATE id = id;";
+		String sql = "INSERT INTO work_type ( work_type ) VALUES ( ? ) ON DUPLICATE KEY UPDATE id = id;";
 		Database db = new Database();
 		try {
 			Connection conn = db.getConnection();
@@ -32,7 +37,7 @@ public class WorkTypeDAO extends ClefDAO {
 			retval = this.sumBatchInsert( results );
 			conn.commit();
 		} catch ( SQLException sqle ) {
-			
+			logger.error( sqle.getMessage() );
 		}
 		return retval;
 	}
@@ -59,7 +64,7 @@ public class WorkTypeDAO extends ClefDAO {
 	
 	public List<WorkType> selectAll() {
 		List<WorkType> wtypes = new ArrayList<WorkType>();
-		String sql = "SELECT * FROM work_types;";
+		String sql = "SELECT * FROM work_type;";
 		Database db = new Database();
 		ResultSet rs = db.select( sql ); 
 		try {
@@ -68,12 +73,18 @@ public class WorkTypeDAO extends ClefDAO {
 			}
 			rs.close();
 		} catch ( SQLException sqle ) {
-			
+			logger.error( sqle.getMessage() );
 		}
 		return wtypes;
 	}
 	
 	public void updateMetadata( List<Metadata> meta, List<WorkType> wtypes ) {
-		
+		for ( WorkType wt : wtypes ) {
+			for ( Metadata m : meta ) {
+				if ( matchWorkType.test( wt, m ) ) {
+					updateWorkType.accept( wt, m );
+				}
+			}
+		}
 	}
 }
