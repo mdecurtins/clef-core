@@ -18,7 +18,7 @@ import clef.api.domain.response.*;
 import clef.api.utility.QueryHelper;
 import clef.datamodel.metadata.MetadataService;
 import clef.datamodel.metadata.MetadataServiceImpl;
-import clef.datamodel.metadata.MetadataLoader;
+
 import clef.mir.*;
 import clef.mir.dataset.Dataset;
 import clef.mir.dataset.DatasetService;
@@ -61,6 +61,7 @@ public class ClefService {
 		if ( ! (this.ms instanceof MetadataService) ) {
 			throw new ClefException( "Fatal: could not obtain an instance of MetadataService." );
 		}
+		
 	}
 	
 	
