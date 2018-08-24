@@ -23,7 +23,7 @@ public class TagDAO extends ClefDAO {
 
 	private static BiPredicate<Tag, Tag> matchTagValue = ( t1, t2 ) -> t1.getValue().equals( t2.getValue() );
 	private static BiPredicate<Tag, Metadata> matchTag = ( t, m ) -> m.getTags().contains( t );
-	private static BiConsumer<Tag, Metadata> updateTag = ( t, m ) -> updateSingleTag( t, m );
+	private static BiConsumer<List<Tag>, Metadata> updateTags = ( tags, m ) -> m.setTags( getUpdatedTagList( tags, m ) );
 	
 	/**
 	 * 
@@ -57,6 +57,23 @@ public class TagDAO extends ClefDAO {
 	 */
 	public static BiPredicate<Tag, Metadata> getMatchingPredicate() {
 		return matchTag;
+	}
+	
+	
+	private static List<Tag> getUpdatedTagList( List<Tag> tags, Metadata m  ) {
+		List<Tag> updated = new ArrayList<Tag>();
+		// Iterate through all tags retrieved from the database
+		for ( Tag t : tags ) {
+			// Iterate through the tags of this Metadata instance
+			for ( Tag tm : m.getTags() ) {
+				// If the current tag value matches a tag value in the Metadata instance
+				if ( matchTagValue.test( t, tm ) ) {
+					// Add the updated tag to the list
+					updated.add( t );
+				}
+			}
+		}
+		return updated;
 	}
 	
 	
@@ -104,30 +121,13 @@ public class TagDAO extends ClefDAO {
 	 * @param tags
 	 */
 	public void updateMetadata( List<Metadata> meta, List<Tag> tags ) {
-		for ( Tag t : tags ) {
-			for ( Metadata m : meta ) {
-				if ( matchTag.test( t, m ) ) {
-					updateTag.accept( t, m );
-				}
-			}
+		// For each Metadata instance, give it the list of all tags and 
+		// then use getUpdatedTagList() to get the right updated tags, 
+		// then replace the Metadata's entire list of tags with the new list
+		for ( Metadata m : meta ) {
+			updateTags.accept( tags, m );
 		}
 	}
 	
-	/**
-	 * 
-	 * @param t a fully-populated Tag with an ID that has been returned from the database
-	 * @param m
-	 * @return
-	 * @since 1.0.0
-	 */
-	private static Metadata updateSingleTag( Tag t, Metadata m ) {
-		List<Tag> tags = m.getTags();
-		for ( int i = 0; i < tags.size(); i++ ) {
-			Tag aTag = tags.get( i );
-			if ( matchTagValue.test( t, aTag ) ) {
-				tags.set( i, t );
-			}
-		}
-		return m;
-	}
+
 }
