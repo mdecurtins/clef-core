@@ -1,10 +1,9 @@
 package clef.datamodel.metadata;
 
-import clef.api.domain.ClefResult;
+
 import clef.datamodel.*;
 import clef.datamodel.db.*;
 import clef.datamodel.metadata.parsers.Humdrum;
-import clef.mir.AlgorithmEnvironmentResponse;
 import clef.mir.MusicFormat;
 import clef.mir.dataset.Dataset;
 import clef.utility.CheckedFunction;
@@ -18,19 +17,20 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class MetadataServiceImpl {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
 
-	public List<ClefResult> mapMetadata( AlgorithmEnvironmentResponse aer ) {
-		
-		
-		
-		return null;
-	}
-	
+@Component
+public class MetadataLoader implements CommandLineRunner {
+
+	private static final Logger logger = LoggerFactory.getLogger( MetadataLoader.class );
 	/**
 	 * 
 	 * @param mf
 	 * @return
+	 * @since 1.0.0
 	 */
 	private CheckedFunction<Path, Metadata> createFunctionForFormat( MusicFormat mf ) {
 		CheckedFunction<Path, Metadata> callback = null;
@@ -43,34 +43,29 @@ public class MetadataServiceImpl {
 		}
 		return callback;
 	}
-	
-	public int insertComposer( Composer c ) {
 
-		return 0;
-	}
 	
-	public int insertEra( Era era ) {
-		return this.insertSingle( era );
-	}
-	
-	public int insertTag( Tag tag ) {
-		return this.insertSingle( tag );
-	}
-	
-	public int insertTagRelation( TagRelation tr ) {
-		InsertRelation ir = new InsertRelation( tr );
-		Database db = new Database();
-		return db.insert( ir );
-	}
-	
-	public int insertWorkType( WorkType wt ) {
-		return this.insertSingle( wt );
-	}
-	
-	private <T extends Single> int insertSingle( T t ) {
-		InsertSingle ins = new InsertSingle( t );
-		Database db = new Database();
-		return db.insert( ins );
+	/**
+	 * Performs a series of foreign-key dependent inserts.
+	 * 
+	 * N.B. Every insert*() call inside this method mutates the {@code List<Metadata>}!
+	 * 
+	 * 
+	 * @param meta
+	 * @since 1.0.0
+	 */
+	private void doInserts( List<Metadata> meta ) {
+		logger.info( "Calling doInserts()..." );
+		// 1. Populate tables with no foreign keys: composers, eras, tags, work_types
+		this.insertEras( meta );
+		this.insertWorkTypes( meta );
+		this.insertComposers( meta );
+		// 2. Populate tables with foreign keys dependent on composers, eras, tags, and work_types
+		
+		//this.insertWorks( meta );
+		
+		// 2b. Insert tag relations
+		// 3. Populate tables with foreign keys dependent on works
 	}
 	
 	
@@ -78,24 +73,40 @@ public class MetadataServiceImpl {
 	 * 
 	 * @param dsets
 	 * @throws IOException
+	 * @since 1.0.0
 	 */
 	public void populateMetadata( List<Dataset> dsets ) throws IOException {
 		
+		logger.info( "Calling populateMetadata()...");
+		
+		if ( dsets.isEmpty() ) {
+			System.out.println( "MetadataService: received empty list of Datasets.");
+		}
+		
 		for ( Dataset d : dsets ) {
 			
-			MusicFormat mf = MusicFormat.valueOf( d.getDatasetAttributes().getFormat() );
+			logger.info( "Dataset name is: " + d.getDatasetAttributes().getName() + " format is: " + d.getDatasetAttributes().getFormat() );
+			// What type of symbolic music files should we look for?
+			MusicFormat mf = MusicFormat.valueOf( d.getDatasetAttributes().getFormat().toUpperCase() );
 			
+			// Which predicate and creator functions should be used for instantiating Metadata instances?
 			Predicate<Path> predicate = this.predicateForFormat( mf );
 			CheckedFunction<Path, Metadata> creatorFunction = this.createFunctionForFormat( mf );
 			
 			List<Metadata> meta = new ArrayList<Metadata>();
 			// Start gathering metadata from files in the directory where the clefdataset.json file resides.
 			if ( ! d.getParentDirectory().equals( "" ) ) {
+				logger.info( "Parent directory is: " + d.getParentDirectory() );
 				meta = FileHandler.traversePath( d.getParentDirectory(), predicate, creatorFunction );
+			} else {
+				System.out.println( "populateMetadata: parent directory was an empty string." );
 			}
 			
 			if ( ! meta.isEmpty() ) {
-				// Loop over the Metadata instances and populate with information.
+				
+				this.doInserts( meta );
+				/*
+				// Loop over the Metadata instances and populate with information
 				for ( Metadata m : meta ) {
 					
 					// Update the dataset content record with the collection name and dataset name.
@@ -106,28 +117,125 @@ public class MetadataServiceImpl {
 					
 					
 				}
+				*/
+			} else {
+				System.out.println( "populateMetadata: list of Metadata was empty.");
 			}
 		}
 		
 	}
 	
-	private void insertEras( List<Metadata> meta ) {
+	
+	private void insertComposers( List<Metadata> meta ) {
+		logger.info( "Calling insertComposers()...");
+		logger.debug( "meta size is " + meta.size() );
 		
+		List<Metadata> uniqueByComposer = meta.stream().filter( ClefUtility.distinctByKey( Metadata::getComposer ) ).collect( Collectors.toList() );
+		
+		if ( ! uniqueByComposer.isEmpty() ) {
+			
+			ComposerDAO cdao = new ComposerDAO();
+			
+			List<Composer> uniqueComposers = cdao.mapFromMetadata( uniqueByComposer );
+			
+			int inserted = cdao.batchInsert( uniqueComposers );
+			logger.debug( "insertComposers(): num inserted = " + inserted);
+			List<Composer> allComposers = cdao.selectAll();
+			logger.debug( "allComposers size is: " + allComposers.size() );
+			if ( ! allComposers.isEmpty() ) {
+				cdao.updateMetadata( meta, allComposers );
+			}
+		}
+	}
+	
+	
+	/**
+	 * Inserts Era values into the database and updates Metadata instances with the resulting IDs.
+	 * 
+	 * Note that the process involves functional filtering of the incoming {@code List<Metadata>} and then 
+	 * updating, via a matching predicate, the items in that same List with new instances of the Era object.
+	 * 
+	 * The result is a {@code List<Metadata>} that is modified in place.
+	 * 
+	 * @param meta
+	 * @see EraDAO#updateMetadata(List, List)
+	 * @since 1.0.0
+	 */
+	private void insertEras( List<Metadata> meta ) {
+		logger.info( "Calling insertEras()...");
 		// Get Metadata instances with unique values for Era
 		List<Metadata> uniqueByEra = meta.stream().filter( ClefUtility.distinctByKey( Metadata::getEra ) ).collect( Collectors.toList() );
 		
 		if ( ! uniqueByEra.isEmpty() ) {
-			List<Era> uniqueEras = new ArrayList<Era>();
-			for ( Metadata m : uniqueByEra ) {
-				uniqueEras.add( m.getEra() );
-			}
+			logger.debug( "uniqueByEra size is " + uniqueByEra.size() );
+			EraDAO ed = new EraDAO();
+			// Extract the Era instances from the list of Metadata instances with unique values for Era
+			List<Era> uniqueEras = ed.mapFromMetadata( uniqueByEra );
 			
-			if ( ! uniqueEras.isEmpty() ) {
-				for ( Era era : uniqueEras ) {
-					int eraID = this.insertEra( era );
-					era.setId( eraID );
-				}
+			// Insert the unique era values into the database. Return the count of rows inserted.
+			int inserted = ed.batchInsert( uniqueEras );
+			if ( inserted > 0 ) {
+				// If any eras were inserted, select all eras
+				List<Era> allEras = ed.selectAll();
+				
+				// Update the entire list of metadata, matching on era value.
+				ed.updateMetadata( meta, allEras );
+			} else {
+				logger.info( "Count of inserted eras = " + inserted );
 			}
+		} else {
+			System.out.println( "insertEras: no Metadata with unique eras found.");
+		}
+	}
+	
+	private void insertTags( List<Metadata> meta ) {
+		logger.info( "Calling insertTags()...");
+		
+		
+	}
+	
+	
+	/**
+	 * 
+	 * @param meta
+	 */
+	private void insertWorkTypes( List<Metadata> meta ) {
+		
+		logger.info( "Calling insertWorkTypes()..." ); 
+		logger.debug( "meta size is " + meta.size() );
+		
+		List<Metadata> uniqueByWorkType = meta.stream().filter( ClefUtility.distinctByKey( Metadata::getWorkType ) ).collect( Collectors.toList() );
+		
+		if ( ! uniqueByWorkType.isEmpty() ) {
+			WorkTypeDAO wtd = new WorkTypeDAO();
+			logger.debug( "uniqueByWorkType size is " + uniqueByWorkType.size() );
+			List<WorkType> uniqueWorkTypes = wtd.mapFromMetadata( uniqueByWorkType );
+			
+			int inserted = wtd.batchInsert( uniqueWorkTypes );
+			logger.debug( "insertWorkTypes(): num inserted = " + inserted );
+			if ( inserted > 0 ) {
+				List<WorkType> allWorkTypes = wtd.selectAll();
+				
+				wtd.updateMetadata( meta, allWorkTypes );
+			}
+		} else {
+			logger.info( "insertWorkTypes(): unique work types was empty");
+		}
+	}
+	
+	
+	/**
+	 * 
+	 * @param meta
+	 */
+	private void insertWorks( List<Metadata> meta ) {
+		WorkDAO wd = new WorkDAO();
+		List<Work> works = wd.mapFromMetadata( meta );
+		
+		int inserted = wd.batchInsert( works );
+		List<Work> allWorks = wd.selectAll();
+		if ( ! allWorks.isEmpty() ) {
+			wd.updateMetadata( meta, allWorks );
 		}
 	}
 	
@@ -146,5 +254,24 @@ public class MetadataServiceImpl {
 			pred = null;
 		}
 		return pred;
+	}
+
+
+	@Override
+	public void run(String... args) throws Exception {
+		/*
+		logger.info( "Invoking MetadataLoader...");
+
+		List<Dataset> dsets = new ArrayList<Dataset>();
+		try {
+			logger.info( "Trying to discover datasets...");
+			dsets = Dataset.discoverDatasets();
+			
+			this.populateMetadata( dsets );
+			
+		} catch ( IOException ioe ) {
+			ioe.printStackTrace();
+		}
+		*/
 	}
 }
