@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import clef.common.ClefDiscoverable;
 import clef.utility.CheckedFunction;
 import clef.utility.FileHandler;
 
@@ -16,7 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 
-public class Dataset {
+public class Dataset extends ClefDiscoverable {
 
 	private DatasetAttributes da;
 	private String collection;

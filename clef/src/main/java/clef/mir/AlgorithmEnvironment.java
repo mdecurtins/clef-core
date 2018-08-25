@@ -11,9 +11,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import clef.common.ClefDiscoverable;
 import clef.utility.CheckedFunction;
 
-public class AlgorithmEnvironment {
+public class AlgorithmEnvironment extends ClefDiscoverable {
 
 	private AlgorithmAttributes aa;
 	private ContainerAttributes ca;
