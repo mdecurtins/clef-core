@@ -6,6 +6,7 @@ import clef.datamodel.db.*;
 import clef.datamodel.metadata.parsers.Humdrum;
 import clef.mir.MusicFormat;
 import clef.mir.dataset.Dataset;
+import clef.utility.CheckedBiFunction;
 import clef.utility.CheckedFunction;
 import clef.utility.ClefUtility;
 import clef.utility.FileHandler;
@@ -32,8 +33,8 @@ public class MetadataLoader implements CommandLineRunner {
 	 * @return
 	 * @since 1.0.0
 	 */
-	private CheckedFunction<Path, Metadata> createFunctionForFormat( MusicFormat mf ) {
-		CheckedFunction<Path, Metadata> callback = null;
+	private CheckedBiFunction<Path, Dataset, Metadata> createFunctionForFormat( MusicFormat mf ) {
+		CheckedBiFunction<Path, Dataset, Metadata> callback = null;
 		switch ( mf ) {
 		case HUMDRUM:
 			callback = Humdrum.getCreatorFunction();
@@ -92,13 +93,13 @@ public class MetadataLoader implements CommandLineRunner {
 			
 			// Which predicate and creator functions should be used for instantiating Metadata instances?
 			Predicate<Path> predicate = this.predicateForFormat( mf );
-			CheckedFunction<Path, Metadata> creatorFunction = this.createFunctionForFormat( mf );
+			CheckedBiFunction<Path, Dataset, Metadata> creatorFunction = this.createFunctionForFormat( mf );
 			
 			List<Metadata> meta = new ArrayList<Metadata>();
 			// Start gathering metadata from files in the directory where the clefdataset.json file resides.
 			if ( ! d.getParentDirectory().equals( "" ) ) {
 				logger.info( "Parent directory is: " + d.getParentDirectory() );
-				meta = FileHandler.traversePath( d.getParentDirectory(), predicate, creatorFunction );
+				meta = FileHandler.traversePath( d.getParentDirectory(), predicate, d, creatorFunction );
 			} else {
 				System.out.println( "populateMetadata: parent directory was an empty string." );
 			}

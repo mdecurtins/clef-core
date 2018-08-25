@@ -2,7 +2,8 @@ package clef.datamodel.metadata.parsers;
 
 import clef.datamodel.*;
 import clef.datamodel.metadata.Metadata;
-import clef.utility.CheckedFunction;
+import clef.mir.dataset.Dataset;
+import clef.utility.CheckedBiFunction;
 
 
 import java.io.IOException;
@@ -35,13 +36,13 @@ public class Humdrum {
 	
 	private static final Predicate<Path> isHumdrumFile = path -> path.toAbsolutePath().toString().endsWith( ".krn" );
 	
-	private static final CheckedFunction<Path, Metadata> createMetadata = path -> Humdrum.parse( path );
+	private static final CheckedBiFunction<Path, Dataset, Metadata> createMetadata = ( p, dc ) -> Humdrum.parse( p, dc );
 	
 	public static Predicate<Path> getPredicate() {
 		return isHumdrumFile;
 	}
 	
-	public static CheckedFunction<Path, Metadata> getCreatorFunction() {
+	public static CheckedBiFunction<Path, Dataset, Metadata> getCreatorFunction() {
 		return createMetadata;
 	}
 	
@@ -50,12 +51,16 @@ public class Humdrum {
 		return vals.stream().map( s -> new Tag( s ) ).collect( Collectors.toList() );
 	}
 
-	public static Metadata parse( Path p ) throws IOException {
+	public static Metadata parse( Path p, Dataset d ) throws IOException {
 		
 		Metadata m = new Metadata();
 		
 		Composer c = new Composer();
-		DatasetContent dc = new DatasetContent();
+		DatasetContent dc = new DatasetContent(
+					d.getCollection(),
+					d.getDatasetAttributes().getName(),
+					p.getFileName().toString()
+				);
 		Era era = null;
 		List<Tag> tags = new ArrayList<Tag>();
 		Work w = new Work();
@@ -63,9 +68,7 @@ public class Humdrum {
 		
 		for ( String line : Files.readAllLines( p, StandardCharsets.UTF_8 ) ) {
 			
-			// Set the dataset content file name.
-			dc.setFilename( p.getFileName().toString() );
-		
+			// Lines that do not start with !!! are not metadata.
 			if ( line.startsWith( "!!!" ) ) {
 				String[] parts = line.split( ":" );
 				String metakey = parts[0].replaceAll( "!", "" );
