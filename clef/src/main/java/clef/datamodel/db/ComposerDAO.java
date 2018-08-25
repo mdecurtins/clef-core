@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import clef.datamodel.Composer;
+import clef.datamodel.Work;
 import clef.datamodel.metadata.Metadata;
 
 public class ComposerDAO extends ClefDAO {
@@ -20,7 +21,7 @@ public class ComposerDAO extends ClefDAO {
 	private static final Logger logger = LoggerFactory.getLogger( ComposerDAO.class );
 	
 	private static BiPredicate<Composer, Metadata> matchComposer = ( composer, m ) -> composer.getName().equals( m.getComposer().getName() );
-	private static BiConsumer<Composer, Metadata> updateComposer = ( composer, m ) -> m.setComposer( composer );
+	private static BiConsumer<Composer, Metadata> updateComposer = ( composer, m ) -> doUpdate( composer, m );
 	
 	
 	/**
@@ -52,6 +53,26 @@ public class ComposerDAO extends ClefDAO {
 	
 	
 	/**
+	 * Update the metadata object, observing foreign key dependency.
+	 * 
+	 * @param c
+	 * @param m
+	 * @since 1.0.0
+	 */
+	private static void doUpdate( Composer c, Metadata m ) {
+		// Set the composer.
+		m.setComposer( c );
+		
+		// Get and update the Metadata's work with the composer's new ID
+		Work w = m.getWork();
+		w.setComposerId( c.getId() );
+		
+		// Replace the Metadata's work.
+		m.setWork( w );
+	}
+	
+	
+	/**
 	 * 
 	 * @return
 	 */
@@ -77,7 +98,6 @@ public class ComposerDAO extends ClefDAO {
 	public List<Composer> mapFromMetadata( List<Metadata> meta ) {
 		List<Composer> composers = new ArrayList<Composer>();
 		for ( Metadata m : meta ) {
-			logger.debug( "mapFromMetadata::getComposer - name = " + m.getComposer().getName() + ", born = " + m.getComposer().born() + ", died = " + m.getComposer().died() );
 			composers.add( m.getComposer() );
 		}
 		return composers;
