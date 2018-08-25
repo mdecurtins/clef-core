@@ -11,6 +11,9 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 import java.util.List;
 import java.util.function.Predicate;
+
+import clef.common.ClefDiscoverable;
+
 import java.util.ArrayList;
 
 /**
@@ -47,6 +50,46 @@ public class FileHandler {
 					
 					// If so, execute the creator function callback passed, which will return a concrete object instance based on the current path.
 					l.add( createFunc.apply( file ) );
+				}
+				
+				return FileVisitResult.CONTINUE;
+			}
+		});
+		
+		// Return the list.
+		return l;
+	}
+	
+	
+	/**
+	 * Method to return a list of objects created from files in a given path using info from the passed {@code ClefDiscoverable}.
+	 * 
+	 * The two-arity version of {@link FileHandler#traversePath(String, Predicate, CheckedFunction)} 
+	 * 
+	 * @param root
+	 * @param pred
+	 * @param discoverable
+	 * @param createFunc
+	 * @return
+	 * @throws IOException
+	 * @since 1.0.0
+	 */
+	public static <T, U extends ClefDiscoverable> List<T> traversePath( String root, Predicate<Path> pred, U discoverable, CheckedBiFunction<Path, U, T> createFunc ) throws IOException {
+		
+		List<T> l = new ArrayList<T>();
+		
+		// Start file tree traversal at the given root.
+		Path p = FileSystems.getDefault().getPath( root );
+		
+		Files.walkFileTree( p, new SimpleFileVisitor<Path>() {
+			@Override
+			public FileVisitResult visitFile( Path file, BasicFileAttributes attrs ) throws IOException {
+				
+				// Test the predicate passed to see if the current file path is one relevant to this method invocation.
+				if ( pred.test( file ) ) {
+					
+					// If so, execute the creator function callback passed, which will return a concrete object instance based on the current path.
+					l.add( createFunc.apply( file, discoverable ) );
 				}
 				
 				return FileVisitResult.CONTINUE;
