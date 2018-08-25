@@ -6,7 +6,6 @@ public class DatasetContent extends ClefDataObject {
 	private String collection;
 	private String datasetName;
 	private String filename;
-	private int workId;
 	
 	public int getId() {
 		return id;
@@ -24,9 +23,6 @@ public class DatasetContent extends ClefDataObject {
 		return filename;
 	}
 	
-	public int getWorkId() {
-		return workId;
-	}
 	
 	public void setId( int id ) {
 		this.id = id;
@@ -43,8 +39,5 @@ public class DatasetContent extends ClefDataObject {
 	public void setFilename( String fname ) {
 		this.filename = fname;
 	}
-	
-	public void setWorkId( int wid ) {
-		this.workId = wid;
-	}
+
 }

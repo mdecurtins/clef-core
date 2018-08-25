@@ -46,13 +46,7 @@ public class InsertDatasetContents extends ClefStatement implements Insert {
 			// This will throw a SQLException when executed, as filename is declared NOT NULL.
 			ps.setNull( 3, Types.VARCHAR );
 		}
-		
-		if ( dc.getWorkId() != 0 ) {
-			ps.setInt( 4, dc.getWorkId() );
-		} else {
-			// This will throw a SQLException when executed, as work_id is declared NOT NULL.
-			ps.setNull( 4, Types.INTEGER );
-		}
+	
 		
 		return ps;
 	}
