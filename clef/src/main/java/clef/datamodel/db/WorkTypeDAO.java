@@ -12,6 +12,7 @@ import java.util.function.BiPredicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import clef.datamodel.Work;
 import clef.datamodel.WorkType;
 import clef.datamodel.metadata.Metadata;
 
@@ -26,7 +27,7 @@ public class WorkTypeDAO extends ClefDAO {
 	private static final Logger logger = LoggerFactory.getLogger( WorkTypeDAO.class );
 	
 	private static BiPredicate<WorkType, Metadata> matchWorkType = ( wt, m ) -> wt.getValue().equals( m.getWorkType().getValue() );
-	private static BiConsumer<WorkType, Metadata> updateWorkType = ( wt, m ) -> m.setWorkType( wt );
+	private static BiConsumer<WorkType, Metadata> updateWorkType = ( wt, m ) -> doUpdate( wt, m );
 
 	/**
 	 * 
@@ -52,6 +53,14 @@ public class WorkTypeDAO extends ClefDAO {
 			logger.error( sqle.getMessage() );
 		}
 		return retval;
+	}
+	
+	
+	private static void doUpdate( WorkType wt, Metadata m ) {
+		m.setWorkType( wt );
+		Work w = m.getWork();
+		w.setWorkTypeId( wt.getId() );
+		m.setWork( w );
 	}
 	
 	

@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 
 import clef.datamodel.Era;
+import clef.datamodel.Work;
 import clef.datamodel.metadata.Metadata;
 
 /**
@@ -26,7 +27,7 @@ public class EraDAO extends ClefDAO {
 	private static final Logger logger = LoggerFactory.getLogger( EraDAO.class );
 	
 	private static BiPredicate<Era, Metadata> matchEra = ( era, m ) -> era.getValue().equals( m.getEra().getValue() );
-	private static BiConsumer<Era, Metadata> updateEra = ( era, m ) -> m.setEra( era );
+	private static BiConsumer<Era, Metadata> updateEra = ( era, m ) -> doUpdate( era, m );
 	
 	
 	/**
@@ -56,6 +57,18 @@ public class EraDAO extends ClefDAO {
 		return retval;
 	}
 	
+	
+	private static void doUpdate( Era era, Metadata m ) {
+		// Set the era on the Metadata instance
+		m.setEra( era );
+		
+		//
+		Work w = m.getWork();
+		w.setEraId( era.getId() );
+		
+		// Update the Metadata work instance
+		m.setWork( w );
+	}
 	
 	/**
 	 * 
