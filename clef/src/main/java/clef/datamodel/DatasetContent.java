@@ -7,6 +7,12 @@ public class DatasetContent extends ClefDataObject {
 	private String datasetName;
 	private String filename;
 	
+	public DatasetContent( String coll, String dset, String fname ) {
+		this.collection = coll;
+		this.datasetName = dset;
+		this.filename = fname;
+	}
+	
 	public int getId() {
 		return id;
 	}
