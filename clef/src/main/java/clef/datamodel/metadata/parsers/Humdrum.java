@@ -131,10 +131,7 @@ public class Humdrum {
 			}
 			i++;
 		}
-		if ( i == 1 ) {
-			logger.error( "Humdrum::setComposerDates - loop did not run, i is 1");
-		}
-		logger.debug( "Humdrum::setComposerDates - matches found, born: " + born + ", died: " + died );
+		
 		c.setDates( born, died );
 	}
 	
