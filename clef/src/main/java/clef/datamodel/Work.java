@@ -14,9 +14,15 @@ public class Work extends ClefDataObject {
 	@JsonIgnore
 	private int composerId;
 	private String composition_date;
+	
+	@JsonIgnore
+	private int datasetContentsId;
+	
 	private String era;
 	@JsonIgnore
 	private int eraId;
+	
+	private String pcn;
 	private String title;
 	private String type;
 	
@@ -48,6 +54,11 @@ public class Work extends ClefDataObject {
 		return composerId;
 	}
 	
+	@JsonIgnore
+	public int getDatasetContentsId() {
+		return datasetContentsId;
+	}
+	
 	public String getEra() {
 		return era;
 	}
@@ -60,6 +71,10 @@ public class Work extends ClefDataObject {
 	@JsonIgnore
 	public int getId() {
 		return id;
+	}
+	
+	public String getPCN() {
+		return pcn;
 	}
 	
 	public String getTitle() {
@@ -93,6 +108,11 @@ public class Work extends ClefDataObject {
 		this.composition_date = cd;
 	}
 	
+	@JsonProperty
+	public void setDatasetContentsId( int id ) {
+		this.datasetContentsId = id;
+	}
+	
 	public void setEra( String e ) {
 		this.era = e;
 	}
@@ -105,6 +125,10 @@ public class Work extends ClefDataObject {
 	@JsonProperty
 	public void setId( int id ) {
 		this.id = id;
+	}
+	
+	public void setPCN( String pcn ) {
+		this.pcn = pcn;
 	}
 	
 	public void setTitle( String t ) {
