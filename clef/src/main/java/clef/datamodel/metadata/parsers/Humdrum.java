@@ -4,6 +4,7 @@ import clef.datamodel.*;
 import clef.datamodel.metadata.Metadata;
 import clef.utility.CheckedFunction;
 
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -19,6 +20,8 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
+
+import org.springframework.web.util.HtmlUtils;
 
 /**
  * Class to parse Humdrum metadata.
@@ -58,11 +61,11 @@ public class Humdrum {
 		Work w = new Work();
 		WorkType wt = null;
 		
-		for ( String line : Files.readAllLines( p, StandardCharsets.ISO_8859_1 ) ) {
+		for ( String line : Files.readAllLines( p, StandardCharsets.UTF_8 ) ) {
 			
 			// Set the dataset content file name.
 			dc.setFilename( p.getFileName().toString() );
-			
+		
 			if ( line.startsWith( "!!!" ) ) {
 				String[] parts = line.split( ":" );
 				String metakey = parts[0].replaceAll( "!", "" );
@@ -74,8 +77,8 @@ public class Humdrum {
 				case "CDT":
 					setComposerDates( c, metaval );
 					break;
-				case "OTL":
-					w.setTitle( trimTitle( metaval ) );
+				case "OTL@@DE":
+					w.setTitle( unescapeTitle( metaval ) );
 					break;
 				case "SCT":
 					setWorkCatalogAndCatalogName( w, metaval );
@@ -91,6 +94,7 @@ public class Humdrum {
 					break;
 				}
 			}
+
 		}
 		
 		// Assign the populated datamodel objects to the Metadata transport object.
@@ -136,22 +140,28 @@ public class Humdrum {
 	}
 	
 	
+	/**
+	 * 
+	 * @param w
+	 * @param metaval
+	 * @since 1.0.0
+	 */
 	private static void setWorkCatalogAndCatalogName( Work w, String metaval ) {
 		String[] both = metaval.split( "\\s+" );
 		w.setCatalog( both[0] );
 		w.setCatalogNumber( both[1] );
 	}
 	
-	private static String trimTitle( String metaval ) {
-		String title = "";
-		metaval = metaval.trim();
-		Pattern p = Pattern.compile( "([A-Za-z\\,'\\s]+)" );
-		Matcher m = p.matcher( metaval );
-		
-		if ( m.matches() ) {
-			title = m.group( 1 );
-		}
-		
-		return title;
+	
+	/**
+	 * Converts any unescaped HTML entities in a string.
+	 * 
+	 * @param metaval
+	 * @return
+	 * @since 1.0.0
+	 */
+	private static String unescapeTitle( String metaval ) {
+		return HtmlUtils.htmlUnescape( metaval );
 	}
+	
 }
