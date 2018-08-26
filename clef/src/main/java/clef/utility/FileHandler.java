@@ -66,10 +66,10 @@ public class FileHandler {
 	 * 
 	 * The two-arity version of {@link FileHandler#traversePath(String, Predicate, CheckedFunction)} 
 	 * 
-	 * @param root
-	 * @param pred
-	 * @param discoverable
-	 * @param createFunc
+	 * @param root the path from which to start traversing the file tree
+	 * @param pred the predicate that should be used to test files for this call
+	 * @param discoverable an instance of an object serialized from a discoverable file
+	 * @param createFunc createFunc the function that creates an object instance, given a path
 	 * @return
 	 * @throws IOException
 	 * @since 1.0.0
