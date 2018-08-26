@@ -34,17 +34,16 @@ public class ClefResultDAO {
 			while ( rs.next() ) {
 				Metadata m = new Metadata();
 				Composer c = new Composer();
-				DatasetContent dc = new DatasetContent();
 				Work w = new Work();
 				
-				dc.setDatasetName( rs.getString( "dataset_name" ) );
-				dc.setFilename( rs.getString( "filename" ) );
+				DatasetContent dc = new DatasetContent( rs.getString( "collection" ), rs.getString( "dataset_name" ), rs.getString( "filename" ) );
 				
 				w.setTitle( rs.getString( "title" ) );
 				w.setCatalog( rs.getString( "catalog" ) );
 				w.setCatalogNumber( rs.getString( "catalog_number" ) );
 				w.setType( rs.getString( "work_type" ) );
 				w.setEra( rs.getString( "era" ) );
+				w.setPCN( rs.getString( "pcn" ) );
 				
 				c.setName( rs.getString( "composer_name" ) );
 				c.setDates( rs.getInt( "born" ), rs.getInt( "died" ) );
