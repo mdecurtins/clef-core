@@ -25,8 +25,7 @@ public class WorkDAO extends ClefDAO {
 	
 	private static final Logger logger = LoggerFactory.getLogger( WorkDAO.class );
 
-	private static BiPredicate<Work, Metadata> matchWork = ( w, m ) -> w.getTitle().equals( m.getWork().getTitle() ) &&
-			   w.getComposerId() == m.getComposer().getId() && w.getDatasetContentsId() == m.getDatasetContent().getId();
+	private static BiPredicate<Work, Metadata> matchWork = ( w, m ) -> doPredicate( w, m );
 
 	private static BiConsumer<Work, Metadata> updateWork = ( w, m ) -> m.setWork( w );
 	
@@ -101,6 +100,24 @@ public class WorkDAO extends ClefDAO {
 	}
 	
 	
+	private static boolean doPredicate( Work w, Metadata m ) {
+		boolean title = false;
+		boolean composer = false;
+		boolean dataset_content = false;
+		
+		// Check if work title matches the Metadata's work's title
+		title = w.getTitle().equals( m.getWork().getTitle() );
+		
+		// Check if work composer ID matches the Metadata's composer's ID
+		composer = w.getComposerId() == m.getComposer().getId();
+		
+		// Check if work dataset content ID matches the Metadata's dataset content ID
+		dataset_content = w.getDatasetContentsId() == m.getDatasetContent().getId();
+		
+		return title && composer && dataset_content;
+	}
+	
+	
 	/**
 	 * 
 	 * @return
@@ -140,11 +157,12 @@ public class WorkDAO extends ClefDAO {
 	 * @since 1.0.0
 	 */
 	public void updateMetadata( List<Metadata> meta, List<Work> works ) {
+		logger.debug( "Calling updateMetadata()...");
 		for ( Work w : works ) {
-			for ( Metadata m : meta ) {
+			for ( Metadata m : meta ) {				
 				if ( matchWork.test( w, m ) ) {
 					updateWork.accept( w, m );
-				}
+				}			
 			}
 		}
 	}
