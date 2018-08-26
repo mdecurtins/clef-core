@@ -23,7 +23,7 @@ public class DatasetContentDAO extends ClefDAO {
 	private static BiPredicate<DatasetContent, Metadata> matchDatasetContent = ( dc, m ) -> dc.getDatasetName().equals( m.getDatasetContent().getDatasetName() ) &&
 			dc.getFilename().equals( m.getDatasetContent().getFilename() );
 	
-	private static BiConsumer<DatasetContent, Metadata> updateDatasetContent = ( dc, m ) -> m.setDatasetContent( dc );
+	private static BiConsumer<DatasetContent, Metadata> updateDatasetContent = ( dc, m ) -> doUpdate( dc, m );
 	
 	public int batchInsert( List<DatasetContent> dsetCont ) {
 		int retval = 0;
@@ -44,6 +44,13 @@ public class DatasetContentDAO extends ClefDAO {
 			logger.error( sqle.getMessage() );
 		}
 		return retval;
+	}
+	
+	private static void doUpdate( DatasetContent dc, Metadata m ) {
+		m.setDatasetContent( dc );
+		Work w = m.getWork();
+		w.setDatasetContentsId( dc.getId() );
+		m.setWork( w );
 	}
 	
 	public static BiPredicate<DatasetContent, Metadata> getMatchingPredicate() {
