@@ -36,7 +36,7 @@ public class Humdrum {
 	
 	private static final Predicate<Path> isHumdrumFile = path -> path.toAbsolutePath().toString().endsWith( ".krn" );
 	
-	private static final CheckedBiFunction<Path, Dataset, Metadata> createMetadata = ( p, dc ) -> Humdrum.parse( p, dc );
+	private static final CheckedBiFunction<Path, Dataset, Metadata> createMetadata = ( p, d ) -> Humdrum.parse( p, d );
 	
 	public static Predicate<Path> getPredicate() {
 		return isHumdrumFile;
