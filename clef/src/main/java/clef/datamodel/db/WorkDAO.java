@@ -40,7 +40,7 @@ public class WorkDAO extends ClefDAO {
 	 */
 	public int batchInsert( List<Work> works ) {
 		int retval = 0;
-		String sql = "INSERT INTO works ( title, catalog, catalog_number, composer_id, era_id, work_type_id ) VALUES ( ?, ?, ?, ?, ?, ? ) ON DUPLICATE KEY UPDATE id = id;";
+		String sql = "INSERT INTO works ( title, catalog, catalog_number, pcn, composer_id, era_id, work_type_id ) VALUES ( ?, ?, ?, ?, ?, ?, ? ) ON DUPLICATE KEY UPDATE id = id;";
 		Database db = new Database();
 		try {
 			Connection conn = db.getConnection();
@@ -49,9 +49,10 @@ public class WorkDAO extends ClefDAO {
 				ps.setString( 1, w.getTitle() );
 				ps.setString( 2, w.getCatalog() );
 				ps.setString( 3, w.getCatalogNumber() );
-				ps.setInt( 4, w.getComposerId() );
-				ps.setInt( 5, w.getEraId() );
-				ps.setInt( 6, w.getWorkTypeId() );
+				ps.setString( 4, w.getPCN() );
+				ps.setInt( 5, w.getComposerId() );
+				ps.setInt( 6, w.getEraId() );
+				ps.setInt( 7, w.getWorkTypeId() );
 				ps.addBatch();
 			}
 			int[] results = ps.executeBatch();
@@ -116,6 +117,7 @@ public class WorkDAO extends ClefDAO {
 				w.setTitle( rs.getString( "title" ) );
 				w.setCatalog( rs.getString( "catalog" ) );
 				w.setCatalogNumber( rs.getString( "catalog_number" ) );
+				w.setPCN( rs.getString( "pcn" ) );
 				w.setComposerId( rs.getInt( "composer_id" ) );
 				w.setEraId( rs.getInt( "era_id" ) );
 				w.setWorkTypeId( rs.getInt( "work_type_id" ) );
