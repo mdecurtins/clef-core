@@ -16,6 +16,12 @@ import java.util.function.BiConsumer;
 import clef.datamodel.*;
 import clef.datamodel.metadata.Metadata;
 
+/**
+ * Data access class for symbolic music source files within a dataset.
+ * 
+ * @author Max DeCurtins
+ * @since 1.0.0
+ */
 public class DatasetContentDAO extends ClefDAO {
 	
 	private static final Logger logger = LoggerFactory.getLogger( DatasetContentDAO.class );
@@ -25,6 +31,14 @@ public class DatasetContentDAO extends ClefDAO {
 	
 	private static BiConsumer<DatasetContent, Metadata> updateDatasetContent = ( dc, m ) -> doUpdate( dc, m );
 	
+	
+	/**
+	 * Inserts records into the dataset_contents table.
+	 * 
+	 * @param dsetCont
+	 * @return
+	 * @since 1.0.0
+	 */
 	public int batchInsert( List<DatasetContent> dsetCont ) {
 		int retval = 0;
 		String sql = "INSERT INTO dataset_contents ( collection, dataset_name, filename ) VALUES ( ?, ?, ? ) ON DUPLICATE KEY UPDATE id = id;";
@@ -47,6 +61,14 @@ public class DatasetContentDAO extends ClefDAO {
 		return retval;
 	}
 	
+	
+	/**
+	 * Callback to execute when updating metadata in {@link #updateMetadata(List, List)}.
+	 * 
+	 * @param dc
+	 * @param m
+	 * @since 1.0.0
+	 */
 	private static void doUpdate( DatasetContent dc, Metadata m ) {
 		m.setDatasetContent( dc );
 		Work w = m.getWork();
@@ -54,14 +76,34 @@ public class DatasetContentDAO extends ClefDAO {
 		m.setWork( w );
 	}
 	
+	
+	/**
+	 * 
+	 * @return
+	 * @since 1.0.0
+	 */
 	public static BiPredicate<DatasetContent, Metadata> getMatchingPredicate() {
 		return matchDatasetContent;
 	}
 	
+	
+	/**
+	 * 
+	 * @return
+	 * @since 1.0.0
+	 */
 	public static BiConsumer<DatasetContent, Metadata> getUpdateConsumerFunction() {
 		return updateDatasetContent;
 	}
 	
+	
+	/**
+	 * Gets a list of DatasetContent objects from the passed {@code List<Metadata>}.
+	 * 
+	 * @param meta
+	 * @return
+	 * @since 1.0.0
+	 */
 	public List<DatasetContent> mapFromMetadata( List<Metadata> meta ) {
 		List<DatasetContent> dsetConts = new ArrayList<DatasetContent>();
 		for ( Metadata m : meta ) {
@@ -70,6 +112,13 @@ public class DatasetContentDAO extends ClefDAO {
 		return dsetConts;
 	}
 	
+	
+	/**
+	 * Selects all records from the dataset_contents table.
+	 * 
+	 * @return
+	 * @since 1.0.0
+	 */
 	public List<DatasetContent> selectAll() {
 		List<DatasetContent> dsetConts = new ArrayList<DatasetContent>();
 		String sql = "SELECT * FROM dataset_contents;";
@@ -88,6 +137,14 @@ public class DatasetContentDAO extends ClefDAO {
 		return dsetConts;
 	}
 	
+	
+	/**
+	 * Updates the metadata.
+	 * 
+	 * @param meta
+	 * @param dsetCont
+	 * @since 1.0.0
+	 */
 	public void updateMetadata( List<Metadata> meta, List<DatasetContent> dsetCont ) {
 		for ( DatasetContent dc : dsetCont ) {
 			for ( Metadata m : meta ) {

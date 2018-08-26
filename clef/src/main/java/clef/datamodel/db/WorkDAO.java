@@ -100,6 +100,13 @@ public class WorkDAO extends ClefDAO {
 	}
 	
 	
+	/**
+	 * 
+	 * @param w
+	 * @param m
+	 * @return
+	 * @since 1.0.0
+	 */
 	private static boolean doPredicate( Work w, Metadata m ) {
 		boolean title = false;
 		boolean composer = false;
