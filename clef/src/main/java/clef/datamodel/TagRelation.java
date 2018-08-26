@@ -11,12 +11,18 @@ package clef.datamodel;
  */
 public class TagRelation extends Relation {
 
+	private int id;
 	private int tagId;
 	private int workId;
 	
-	public TagRelation( int tId, int wId ) {
+	public TagRelation( int id, int tId, int wId ) {
+		this.id = id;
 		this.tagId = tId;
 		this.workId = wId;
+	}
+	
+	public int getId() {
+		return id;
 	}
 	
 	public int getRelationId() {
@@ -25,6 +31,10 @@ public class TagRelation extends Relation {
 	
 	public int getRelatedToId() {
 		return workId;
+	}
+	
+	public void setId( int id ) {
+		this.id = id;
 	}
 	
 	public void setRelationId( int tagId ) {
