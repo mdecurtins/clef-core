@@ -26,8 +26,7 @@ public class WorkDAO extends ClefDAO {
 	private static final Logger logger = LoggerFactory.getLogger( WorkDAO.class );
 
 	private static BiPredicate<Work, Metadata> matchWork = ( w, m ) -> w.getTitle().equals( m.getWork().getTitle() ) &&
-			   w.getCatalog().equals( m.getWork().getCatalog() ) && 
-			   w.getCatalogNumber().equals( m.getWork().getCatalogNumber() );
+			   w.getComposerId() == m.getComposer().getId() && w.getDatasetContentsId() == m.getDatasetContent().getId();
 
 	private static BiConsumer<Work, Metadata> updateWork = ( w, m ) -> m.setWork( w );
 	
