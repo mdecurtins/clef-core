@@ -44,6 +44,7 @@ public class TagRelationDAO extends ClefDAO {
 				for ( Tag t : m.getTags() ) {
 					ps.setInt( 1, m.getWork().getId() );
 					ps.setInt( 2, t.getId() );
+					ps.addBatch();
 				}
 			}
 			
@@ -71,7 +72,7 @@ public class TagRelationDAO extends ClefDAO {
 		ResultSet rs = db.select( sql );
 		try {
 			while ( rs.next() ) {
-				TagRelation tr = new TagRelation( rs.getInt( "tag_id" ), rs.getInt( "work_id" ) );
+				TagRelation tr = new TagRelation( rs.getInt( "id" ), rs.getInt( "tag_id" ), rs.getInt( "work_id" ) );
 				trs.add( tr );
 			}
 		} catch ( SQLException sqle ) {
