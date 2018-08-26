@@ -36,6 +36,7 @@ public class DatasetContentDAO extends ClefDAO {
 				ps.setString( 1, dc.getCollection() );
 				ps.setString( 2, dc.getDatasetName() );
 				ps.setString( 3, dc.getFilename() );
+				ps.addBatch();
 			}
 			int[] results = ps.executeBatch();
 			retval = this.sumBatchInsert( results );
