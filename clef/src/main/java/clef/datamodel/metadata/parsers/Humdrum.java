@@ -61,6 +61,7 @@ public class Humdrum {
 					d.getDatasetAttributes().getName(),
 					p.getFileName().toString()
 				);
+		
 		Era era = null;
 		List<Tag> tags = new ArrayList<Tag>();
 		Work w = new Work();
@@ -85,6 +86,9 @@ public class Humdrum {
 					break;
 				case "SCT":
 					setWorkCatalogAndCatalogName( w, metaval );
+					break;
+				case "PC#":
+					w.setPCN( metaval.trim() );
 					break;
 				case "AST":
 					era = new Era( metaval );
